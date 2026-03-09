@@ -1,2 +1,2 @@
 # studi
-Sistema de acompanhamento de progresso de estudo.
+Sistema de revisão de estudos por FlashCards
