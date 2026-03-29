@@ -1,0 +1,24 @@
+<div class="card-estudo">
+    <h2>Matéria: {{ card.subject.name }}</h2>
+    
+    <div id="pergunta">
+        <h3>Pergunta:</h3>
+        <p>{{ card.question }}</p>
+        <button onclick="mostrarResposta()">Ver Resposta</button>
+    </div>
+
+    <div id="resposta" style="display: none; margin-top: 20px;">
+        <h3>Resposta:</h3>
+        <p>{{ card.answer }}</p>
+        
+        <p>Como foi seu desempenho?</p>
+        <a href="{% url 'registrar_revisao' card.id 'erro' %}" style="color: red;">Errei (Revisar amanhã)</a>
+        <a href="{% url 'registrar_revisao' card.id 'acerto' %}" style="color: green;">Acertei (Dobrar intervalo)</a>
+    </div>
+</div>
+
+<script>
+function mostrarResposta() {
+    document.getElementById('resposta').style.display = 'block';
+}
+</script>

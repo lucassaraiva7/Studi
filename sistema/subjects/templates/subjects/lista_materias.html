@@ -1,0 +1,10 @@
+<h2>Minhas Matérias</h2>
+<a href="/admin/subjects/subject/add/">+ Nova Matéria</a>
+<ul>
+    {% for materia in materias %}
+    <li>
+        {{ materia.name }} 
+        <a href="{% url 'sessao_revisao' materia.id %}">▶️ Estudar</a>
+    </li>
+    {% endfor %}
+</ul>

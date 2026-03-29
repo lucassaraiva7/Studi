@@ -1,0 +1,16 @@
+<h2>Todos os Flashcards</h2>
+<a href="/admin/flashcards/flashcard/add/">+ Novo Card</a>
+<table border="1">
+    <tr>
+        <th>Matéria</th>
+        <th>Pergunta</th>
+        <th>Próxima Revisão</th>
+    </tr>
+    {% for card in cards %}
+    <tr>
+        <td>{{ card.subject.name }}</td>
+        <td>{{ card.question }}</td>
+        <td>{{ card.next_review }}</td>
+    </tr>
+    {% endfor %}
+</table>
