@@ -9,17 +9,22 @@
         <p style="color: #4a5568;"><strong>Pergunta:</strong> {{ card.question }}</p>
     </div>
 
-    <form method="POST">
-        {% csrf_token %}
-        <button type="submit" style="background-color: #e53e3e; color: white; padding: 12px 24px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.3s;">
-            Sim, excluir permanentemente
-        </button>
-        
-        <div style="margin-top: 20px;">
-            <a href="{% url 'materia_detalhes' card.subject.id %}" style="color: #718096; text-decoration: none; font-size: 14px;">
-                Cancelar e voltar
-            </a>
-        </div>
-    </form>
+ <form method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="origem" value="{{ origem }}">
+    
+    <button type="submit" style="background-color: #e53e3e; ...">
+        Sim, excluir permanentemente
+    </button>
+    
+    <div style="margin-top: 20px;">
+        {% if origem == 'geral' %}
+            <a href="{% url 'lista_flashcards' %}" style="color: #666;">Cancelar e manter card</a>
+        {% else %}
+            <a href="{% url 'materia_detalhes' card.subject.id %}" style="color: #666;">Cancelar e manter card</a>
+        {% endif %}
+    </div>
+</form>
+
 </div>
 {% endblock %}

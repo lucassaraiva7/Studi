@@ -1,16 +1,102 @@
-<h2>Todos os Flashcards</h2>
-<a href="/admin/flashcards/flashcard/add/">+ Novo Card</a>
-<table border="1">
-    <tr>
-        <th>Matéria</th>
-        <th>Pergunta</th>
-        <th>Próxima Revisão</th>
-    </tr>
-    {% for card in cards %}
-    <tr>
-        <td>{{ card.subject.name }}</td>
-        <td>{{ card.question }}</td>
-        <td>{{ card.next_review }}</td>
-    </tr>
-    {% endfor %}
-</table>
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .flashcards-page { padding: 40px; font-family: 'Inter', sans-serif; background: #fcfcfc; min-height: 100vh; }
+    
+    /* Cabeçalho */
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+    .page-header h1 { font-size: 28px; font-weight: 700; margin: 0; color: #1a1a1a; }
+    .page-header p { color: #888; margin: 5px 0 0 0; }
+
+    /* Filtros: Busca + Select */
+    .filter-container { display: flex; gap: 15px; margin-bottom: 30px; }
+    
+    .search-box { position: relative; flex: 1; }
+    .search-input { 
+        width: 100%; padding: 12px 15px 12px 42px; border-radius: 12px; 
+        border: 1px solid #eee; outline: none; transition: 0.2s; font-size: 15px;
+    }
+    .search-input:focus { border-color: #4382f4; }
+    .search-icon { position: absolute; left: 15px; top: 13px; color: #aaa; }
+
+    .subject-select { 
+        padding: 0 15px; border-radius: 12px; border: 1px solid #eee; 
+        background: white; min-width: 220px; outline: none; cursor: pointer;
+    }
+
+    /* Lista de Cards Estilo Horizontal */
+    .flashcard-list { display: flex; flex-direction: column; gap: 16px; }
+    
+    .flashcard-card { 
+        background: white; border-radius: 16px; border: 1px solid #f0f0f0; 
+        padding: 24px; display: flex; justify-content: space-between; align-items: flex-start;
+        transition: transform 0.2s, border-color 0.2s;
+    }
+    .flashcard-card:hover { border-color: #e0e0e0; transform: translateY(-2px); }
+
+    .card-meta { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #888; margin-bottom: 10px; }
+    .status-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+    .card-question { font-size: 18px; font-weight: 600; color: #1a1a1a; margin: 0 0 8px 0; }
+    .card-answer { color: #666; font-size: 15px; margin: 0; line-height: 1.5; }
+
+    .card-actions { display: flex; gap: 15px; }
+    .action-link { text-decoration: none; color: #aaa; font-size: 18px; transition: 0.2s; }
+    .action-link:hover { color: #333; }
+    .delete-hover:hover { color: #dc3545; }
+
+    /* Botão Azul */
+    .btn-primary { background: #4382f4; color: white !important; padding: 12px 24px; border-radius: 10px; text-decoration: none; font-weight: 600; display: inline-block; }
+</style>
+
+<div class="flashcards-page">
+    <div class="page-header">
+        <div>
+            <h1>Flashcards</h1>
+            <p>Gerencie todos os seus flashcards.</p>
+        </div>
+        <a href="{% url 'novo_flashcard_geral' %}" class="btn-primary">+ Novo flashcard</a>
+    </div>
+
+    <form method="GET" class="filter-container">
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" name="q" value="{{ query }}" class="search-input" placeholder="Buscar flashcards...">
+        </div>
+        
+        <select name="materia" class="subject-select" onchange="this.form.submit()">
+            <option value="">Todas as matérias</option>
+            {% for m in materias %}
+                <option value="{{ m.id }}" {% if materia_selecionada == m.id|stringformat:"i" %}selected{% endif %}>
+                    {{ m.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </form>
+
+    <div class="flashcard-list">
+        {% for card in cards %}
+        <div class="flashcard-card">
+            <div>
+                <div class="card-meta">
+                    <div class="status-dot" style="background-color: {{ card.subject.color }};"></div>
+                    {{ card.subject.name }}
+                </div>
+                <h3 class="card-question">{{ card.question }}</h3>
+                <p class="card-answer">{{ card.answer }}</p>
+            </div>
+            
+            <div class="card-actions">
+                <a href="{% url 'editar_flashcard' card.id %}?origem=geral" class="action-link" title="Editar"> ✏️</a>
+                <a href="{% url 'excluir_flashcard' card.id %}?origem=geral" class="action-link delete-hover">🗑️</a>
+            </div>
+        </div>
+        {% empty %}
+        <div style="text-align: center; padding: 60px; color: #999; background: white; border-radius: 16px; border: 1px dashed #eee;">
+            <p>Nenhum flashcard encontrado. Tente buscar por outro termo ou matéria.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -5,12 +5,35 @@ from .models import Flashcard, ReviewLog
 from .forms import FlashcardForm
 from subjects.models import Subject
 
-# 1. LISTAR (Com select_related para performance)
 @login_required
 def lista_flashcards(request):
-    # select_related busca a matéria junto com o card em uma única consulta
-    cards = Flashcard.objects.filter(subject__user=request.user).select_related('subject')
-    return render(request, 'flashcards/lista_flashcards.html', {'cards': cards})
+    # Pega os parâmetros da URL (ex: ?q=python&materia=1)
+    query = request.GET.get('q', '')
+    materia_id = request.GET.get('materia', '')
+
+    # Começa com todos os cards do usuário
+    cards = Flashcard.objects.filter(subject__user=request.user)
+
+    # Aplica a busca por texto (Pergunta ou Resposta)
+    if query:
+        cards = cards.filter(
+            Q(question__icontains=query) | Q(answer__icontains=query)
+        )
+
+    # Aplica o filtro por Matéria
+    if materia_id:
+        cards = cards.filter(subject_id=materia_id)
+
+    # Busca as matérias para preencher o select do filtro
+    materias = Subject.objects.filter(user=request.user)
+
+    return render(request, 'flashcards/lista_flashcards.html', {
+        'cards': cards,
+        'materias': materias,
+        'query': query,
+        'materia_selecionada': materia_id
+    })
+    
 
 # 2. CADASTRAR
 @login_required
@@ -39,30 +62,59 @@ def novo_flashcard(request, materia_id):
 def editar_flashcard(request, pk):
     card = get_object_or_404(Flashcard, pk=pk, subject__user=request.user)
     
+    # 1. Pega a origem da URL (se não tiver, assume que veio da 'materia')
+    origem = request.GET.get('origem', 'materia')
+
     if request.method == "POST":
         form = FlashcardForm(request.POST, instance=card)
+        # 2. Pega a origem que veio escondida no formulário
+        origem = request.POST.get('origem', 'materia')
+        
         if form.is_valid():
             form.save()
+            # 3. Redirecionamento Inteligente
+            if origem == 'geral':
+                return redirect('lista_flashcards')
             return redirect('materia_detalhes', pk=card.subject.id)
     else:
         form = FlashcardForm(instance=card)
     
-    # O SEGREDO ESTÁ AQUI: passamos 'materia': card.subject no contexto
     return render(request, 'flashcards/form_flashcard.html', {
         'form': form, 
         'titulo': 'Editar Flashcard',
-        'materia': card.subject  
+        'materia': card.subject,
+        'origem': origem # Passa a origem para o template
     })
-    
-# 4. EXCLUIR
+
+# EXCLUIR
 @login_required
 def excluir_flashcard(request, pk):
-    card = get_object_or_404(Flashcard, pk=pk, subject__user=request.user)
+    # Usamos filter().first() para evitar o erro 404 caso o card já tenha sido apagado
+    card = Flashcard.objects.filter(pk=pk, subject__user=request.user).first()
+    
+    # Se o card não existe (já foi apagado), volta para onde o usuário estava
+    origem = request.GET.get('origem', 'materia')
+    if not card:
+        if origem == 'geral':
+            return redirect('lista_flashcards')
+        return redirect('lista_materias') # Ou uma página padrão segura
+
     materia_id = card.subject.id
+
     if request.method == "POST":
+        origem = request.POST.get('origem', 'materia')
         card.delete()
+        
+        # Redirecionamento após apagar
+        if origem == 'geral':
+            return redirect('lista_flashcards')
         return redirect('materia_detalhes', pk=materia_id)
-    return render(request, 'flashcards/confirmar_exclusao_card.html', {'card': card})
+
+    # Passamos a origem para o template de confirmação
+    return render(request, 'flashcards/confirmar_exclusao_card.html', {
+        'card': card,
+        'origem': origem
+    })
 
 # 5. REVISÃO POR MATÉRIA
 @login_required
