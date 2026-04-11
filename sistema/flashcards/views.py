@@ -37,24 +37,42 @@ def lista_flashcards(request):
 
 # 2. CADASTRAR
 @login_required
-def novo_flashcard(request, materia_id):
-    materia = get_object_or_404(Subject, id=materia_id, user=request.user)
+def novo_flashcard(request, materia_id=None):
+    materia = None
     
+    # Se veio ID na URL, buscamos a matéria específica
+    if materia_id:
+        materia = get_object_or_404(Subject, id=materia_id, user=request.user)
+
     if request.method == "POST":
         form = FlashcardForm(request.POST)
         if form.is_valid():
             card = form.save(commit=False)
-            card.subject = materia 
+            
+            # Se viemos de uma matéria específica, forçamos o vínculo aqui
+            if materia:
+                card.subject = materia
+            
+            # Se não veio materia_id, o 'subject' virá do que o usuário 
+            # selecionou no dropdown do formulário automaticamente.
             card.save()
-            return redirect('materia_detalhes', pk=materia.id)
+            
+            # Redirecionamento inteligente
+            if materia:
+                return redirect('materia_detalhes', pk=materia.id)
+            return redirect('lista_flashcards')
     else:
-        # Passamos a matéria inicial, mas no template você pode esconder esse campo
-        form = FlashcardForm(initial={'subject': materia})
-    
+        # Se veio da matéria, já deixa ela pré-selecionada no form
+        initial_data = {'subject': materia} if materia else {}
+        form = FlashcardForm(initial=initial_data)
+        
+        # Filtra para o usuário ver apenas as matérias DELE no dropdown
+        form.fields['subject'].queryset = Subject.objects.filter(user=request.user)
+
     return render(request, 'flashcards/form_flashcard.html', {
         'form': form,
         'materia': materia,
-        'titulo': f'Novo Flashcard para {materia.name}'
+        'titulo': 'Novo Flashcard'
     })
 
 # 3. EDITAR
@@ -83,8 +101,9 @@ def editar_flashcard(request, pk):
         'form': form, 
         'titulo': 'Editar Flashcard',
         'materia': card.subject,
-        'origem': origem # Passa a origem para o template
+        'origem': origem 
     })
+    
 
 # EXCLUIR
 @login_required

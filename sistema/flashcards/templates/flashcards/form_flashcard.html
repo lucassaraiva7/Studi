@@ -1,21 +1,34 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %}
+
+{% block content %}
     <h2>{{ titulo }}</h2>
-    <p>Matéria: {{ materia.name }}</p>
+    
+    {# Só mostra o nome da matéria se ela existir, senão fica estranho #}
+    {% if materia %}
+        <p>Matéria: <strong>{{ materia.name }}</strong></p>
+    {% else %}
+        <p>Defina a matéria no formulário abaixo:</p>
+    {% endif %}
 
     <form method="POST">
-    {% csrf_token %}
-    
-    <input type="hidden" name="origem" value="{{ origem }}">
+        {% csrf_token %}
+        
+        {# Mantém a origem para a View saber para onde te mandar no POST #}
+        <input type="hidden" name="origem" value="{{ origem }}">
 
-    {{ form.as_p }}
-    
-    <button type="submit" class="btn btn-success">Salvar Alterações</button>
-    
-    {% if origem == 'geral' %}
-        <a href="{% url 'lista_flashcards' %}" class="btn btn-secondary">Cancelar</a>
-    {% else %}
-        <a href="{% url 'materia_detalhes' materia.id %}" class="btn btn-secondary">Cancelar</a>
-    {% endif %}
-</form>
-
+        {{ form.as_p }}
+        
+        <div style="margin-top: 20px;">
+            <button type="submit" class="btn btn-success">Salvar Flashcard</button>
+            
+            {# Lógica de Cancelar Inteligente #}
+            {% if materia and origem != 'geral' %}
+                {# Se eu vim de uma matéria específica, volto para ela #}
+                <a href="{% url 'materia_detalhes' materia.id %}" class="btn btn-secondary">Cancelar</a>
+            {% else %}
+                {# Se eu vim da tela geral ou não tem matéria definida, volto para a lista de todos #}
+                <a href="{% url 'lista_flashcards' %}" class="btn btn-secondary">Cancelar</a>
+            {% endif %}
+        </div>
+    </form>
 {% endblock %}
