@@ -1,0 +1,24 @@
+# Ambiente Virtual
+venv/
+env/
+.env
+
+# Python (Arquivos compilados e cache)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Banco de Dados Local (SQLite)
+db.sqlite3
+
+# Pasta do VS Code ou outras IDEs
+.vscode/
+.idea/
+
+# Arquivos de sistema (Windows/Mac)
+Thumbs.db
+.DS_Store
+
+# Pasta de arquivos de mídia 
+media/
