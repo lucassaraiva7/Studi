@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="padding: 40px; max-width: 600px; margin: auto; text-align: center; font-family: 'Inter', sans-serif;">
+    <h2 style="color: #1a1a1a;">Excluir Flashcard</h2>
+    
+    <div style="background: #fff5f5; border: 1px solid #feb2b2; padding: 20px; border-radius: 12px; margin: 20px 0;">
+        <p style="color: #c53030; font-weight: 600;">Tem certeza que deseja apagar este card?</p>
+        <p style="color: #4a5568;"><strong>Pergunta:</strong> {{ card.question }}</p>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit" style="background-color: #e53e3e; color: white; padding: 12px 24px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.3s;">
+            Sim, excluir permanentemente
+        </button>
+        
+        <div style="margin-top: 20px;">
+            <a href="{% url 'materia_detalhes' card.subject.id %}" style="color: #718096; text-decoration: none; font-size: 14px;">
+                Cancelar e voltar
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

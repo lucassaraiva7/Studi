@@ -46,8 +46,14 @@ def editar_flashcard(request, pk):
             return redirect('materia_detalhes', pk=card.subject.id)
     else:
         form = FlashcardForm(instance=card)
-    return render(request, 'flashcards/form_flashcard.html', {'form': form, 'titulo': 'Editar Flashcard'})
-
+    
+    # O SEGREDO ESTÁ AQUI: passamos 'materia': card.subject no contexto
+    return render(request, 'flashcards/form_flashcard.html', {
+        'form': form, 
+        'titulo': 'Editar Flashcard',
+        'materia': card.subject  
+    })
+    
 # 4. EXCLUIR
 @login_required
 def excluir_flashcard(request, pk):
