@@ -1,10 +1,19 @@
 <h2>Minhas Matérias</h2>
-<a href="/admin/subjects/subject/add/">+ Nova Matéria</a>
+<a href="{% url 'nova_materia' %}">+ Nova Matéria</a>
+
 <ul>
     {% for materia in materias %}
-    <li>
-        {{ materia.name }} 
-        <a href="{% url 'sessao_revisao' materia.id %}">▶️ Estudar</a>
+    <li style="border-left: 10px solid {{ materia.color }}; padding: 10px; margin: 10px 0; list-style: none; background-color: #f4f4f4; border-radius: 5px;">
+        <a href="{% url 'materia_detalhes' materia.id %}" style="text-decoration: none; color: #333; font-size: 1.1em; font-weight: bold;">
+            {{ materia.name }} ➔
+        </a>
+        
+        <br>
+        <div style="margin-top: 5px;">
+            <a href="{% url 'sessao_revisao' materia.id %}" style="text-decoration: none;">▶️ Estudar</a> | 
+            <a href="{% url 'editar_materia' materia.id %}" style="text-decoration: none;">✏️ Editar</a> | 
+            <a href="{% url 'excluir_materia' materia.id %}" style="color: red; text-decoration: none;">🗑️ Excluir</a>
+        </div>
     </li>
     {% endfor %}
 </ul>

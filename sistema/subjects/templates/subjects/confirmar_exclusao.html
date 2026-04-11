@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Confirmar Exclusão</title>
+</head>
+<body>
+    <h2 style="color: red;">⚠️ Confirmar Exclusão</h2>
+    
+    <p>Tem certeza que deseja excluir a matéria <strong>"{{ materia.name }}"</strong>?</p>
+    <p><em>Aviso: Todos os flashcards vinculados a esta matéria também serão removidos.</em></p>
+
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit" style="background-color: red; color: white; padding: 10px; cursor: pointer;">
+            Sim, excluir definitivamente
+        </button>
+        <a href="{% url 'lista_materias' %}" style="margin-left: 10px;">Cancelar</a>
+    </form>
+</body>
+</html>

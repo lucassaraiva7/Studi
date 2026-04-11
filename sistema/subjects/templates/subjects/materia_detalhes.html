@@ -1,0 +1,35 @@
+<h2>Matéria: {{ materia.name }}</h2>
+<div style="background: {{ materia.color }}; height: 8px; width: 100px; border-radius: 5px; margin-bottom: 20px;"></div>
+
+<div style="margin-bottom: 20px;">
+    <a href="{% url 'novo_flashcard' materia.id %}" style="background-color: #28a745; color: white; padding: 10px; text-decoration: none; border-radius: 5px;">
+        ➕ Novo Flashcard
+    </a>
+    <a href="{% url 'sessao_revisao' materia.id %}" style="background-color: #007bff; color: white; padding: 10px; text-decoration: none; border-radius: 5px; margin-left: 10px;">
+        ▶️ Estudar esta Matéria
+    </a>
+</div>
+
+<hr>
+
+<h3>Cards nesta matéria:</h3>
+{% if cards %}
+    <ul>
+        {% for card in cards %}
+        <li style="border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; list-style: none; border-radius: 8px; background: #fff;">
+            <strong>P:</strong> {{ card.question }} <br>
+            <strong>R:</strong> {{ card.answer }} <br>
+            <small style="color: #666;">Próxima revisão: {{ card.next_review }}</small>
+            <div style="margin-top: 10px;">
+                <a href="{% url 'editar_flashcard' card.id %}" style="font-size: 0.9em;">✏️ Editar</a> | 
+                <a href="{% url 'excluir_flashcard' card.id %}" style="color: red; font-size: 0.9em;">🗑️ Excluir</a>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Nenhum flashcard criado para esta matéria ainda. Comece criando um!</p>
+{% endif %}
+
+<br>
+<a href="{% url 'lista_materias' %}">⬅️ Voltar para a lista</a>

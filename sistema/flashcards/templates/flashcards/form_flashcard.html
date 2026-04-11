@@ -1,0 +1,12 @@
+{% extends "base.html" %} {% block content %}
+    <h2>{{ titulo }}</h2>
+    <p>Matéria: {{ materia.name }}</p>
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        
+        <button type="submit" class="btn btn-success">Salvar Flashcard</button>
+        <a href="{% url 'materia_detalhes' materia.id %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+{% endblock %}

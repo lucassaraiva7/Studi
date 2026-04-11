@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Studi System</title>
+    </head>
+<body>
+    <nav>
+        <a href="/">Home</a> | 
+        <a href="{% url 'lista_flashcards' %}">Meus Flashcards</a>
+    </nav>
+
+    <hr>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+</body>
+</html>
