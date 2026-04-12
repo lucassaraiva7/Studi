@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Revisão Concluída!{% endblock %}
+
+{% block content %}
+<div class="container text-center mt-5">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h1 class="card-title"> Revisão Concluída! </h1>
+            <p class="lead">Você revisou todos os cards que estavam pendentes.</p>
+            <hr>
+            <div class="row mt-4">
+                <div class="col">
+                    <div class="alert alert-success">
+                        <h2>Acertos: {{ acertos }}</h2>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="alert alert-danger">
+                        <h2>Erros: {{ erros }}</h2>
+                    </div>
+                </div>
+            </div>
+            <a href="{% url 'lista_materias' %}" class="btn btn-primary btn-lg mt-3">Voltar para Matérias</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

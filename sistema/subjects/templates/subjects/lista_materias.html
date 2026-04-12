@@ -1,19 +1,40 @@
-<h2>Minhas Matérias</h2>
-<a href="{% url 'nova_materia' %}">+ Nova Matéria</a>
+{% extends 'base.html' %}
 
-<ul>
+{% block title %}Minhas Matérias - Studi{% endblock %}
+
+{% block content %}
+<!-- Cabeçalho da página com botões -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Minhas Matérias</h2>
+    <div>
+        <a href="{% url 'estudar_tudo' %}" class="btn btn-info text-white">🧠 Revisão Global</a>
+        <a href="{% url 'nova_materia' %}" class="btn btn-primary">+ Nova Matéria</a>
+    </div>
+</div>
+
+<!-- Lista de matérias -->
+<div class="list-group">
     {% for materia in materias %}
-    <li style="border-left: 10px solid {{ materia.color }}; padding: 10px; margin: 10px 0; list-style: none; background-color: #f4f4f4; border-radius: 5px;">
-        <a href="{% url 'materia_detalhes' materia.id %}" style="text-decoration: none; color: #333; font-size: 1.1em; font-weight: bold;">
-            {{ materia.name }} ➔
-        </a>
-        
-        <br>
-        <div style="margin-top: 5px;">
-            <a href="{% url 'sessao_revisao' materia.id %}" style="text-decoration: none;">▶️ Estudar</a> | 
-            <a href="{% url 'editar_materia' materia.id %}" style="text-decoration: none;">✏️ Editar</a> | 
-            <a href="{% url 'excluir_materia' materia.id %}" style="color: red; text-decoration: none;">🗑️ Excluir</a>
+    <div class="list-group-item list-group-item-action flex-column align-items-start mb-2 border-start-0" style="border-left: 10px solid {{ materia.color }} !important;">
+        <div class="d-flex w-100 justify-content-between">
+            <a href="{% url 'materia_detalhes' materia.id %}" class="text-decoration-none text-dark">
+                <h5 class="mb-1">{{ materia.name }}</h5>
+            </a>
+            <div>
+                <a href="{% url 'sessao_revisao' materia.id %}" class="btn btn-sm btn-outline-secondary">▶️ Estudar</a>
+                <a href="{% url 'editar_materia' materia.id %}" class="btn btn-sm btn-outline-primary">✏️ Editar</a>
+                <a href="{% url 'excluir_materia' materia.id %}" class="btn btn-sm btn-outline-danger">🗑️ Excluir</a>
+            </div>
         </div>
-    </li>
+    </div>
+    {% empty %}
+    <div class="card text-center">
+        <div class="card-body">
+            <h5 class="card-title">Nenhuma matéria encontrada</h5>
+            <p class="card-text">Você ainda não cadastrou nenhuma matéria. Que tal começar agora?</p>
+            <a href="{% url 'nova_materia' %}" class="btn btn-success">Criar minha primeira matéria</a>
+        </div>
+    </div>
     {% endfor %}
-</ul>
+</div>
+{% endblock %}
