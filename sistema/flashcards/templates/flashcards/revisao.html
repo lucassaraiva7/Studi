@@ -1,24 +1,61 @@
-<div class="card-estudo">
-    <h2>Matéria: {{ card.subject.name }}</h2>
+{% extends 'base.html' %}
+
+{% block title %}Revisando: {{ card.subject.name }}{% endblock %}
+
+{% block content %}
+<div class="container text-center" style="max-width: 700px;">
     
-    <div id="pergunta">
-        <h3>Pergunta:</h3>
-        <p>{{ card.question }}</p>
-        <button onclick="mostrarResposta()">Ver Resposta</button>
+    <h2 class="mb-4">Revisando: <span class="badge" style="background-color: {{ card.subject.color }};">{{ card.subject.name }}</span></h2>
+
+    
+    <div id="question-card" class="card shadow-sm mb-4">
+        <div class="card-header">
+            <h3 class="mb-0">Pergunta</h3>
+        </div>
+        <div class="card-body" style="min-height: 150px;">
+            <p class="fs-4">{{ card.question }}</p>
+        </div>
     </div>
 
-    <div id="resposta" style="display: none; margin-top: 20px;">
-        <h3>Resposta:</h3>
-        <p>{{ card.answer }}</p>
-        
-        <p>Como foi seu desempenho?</p>
-        <a href="{% url 'registrar_revisao' card.id 'erro' %}" style="color: red;">Errei (Revisar amanhã)</a>
-        <a href="{% url 'registrar_revisao' card.id 'acerto' %}" style="color: green;">Acertei (Dobrar intervalo)</a>
+    <!-- Card da Resposta (inicialmente oculto) -->
+    <div id="answer-card" class="card shadow-sm mb-4 d-none">
+        <div class="card-header bg-light">
+            <h3 class="mb-0">Resposta</h3>
+        </div>
+        <div class="card-body" style="min-height: 150px;">
+            <p class="fs-4">{{ card.answer }}</p>
+        </div>
     </div>
+
+    
+    <div class="mt-4">
+    
+        <button id="show-answer-btn" class="btn btn-primary btn-lg">Mostrar Resposta</button>
+
+    
+        <div id="feedback-btns" class="d-none">
+            <p class="mt-3">Você lembrou da resposta?</p>
+            <a href="{% url 'registrar_revisao' card.id 'acerto' %}" class="btn btn-success btn-lg"> Sim, acertei!</a>
+            <a href="{% url 'registrar_revisao' card.id 'erro' %}" class="btn btn-danger btn-lg"> Não lembrei</a>
+        </div>
+    </div>
+
 </div>
 
 <script>
-function mostrarResposta() {
-    document.getElementById('resposta').style.display = 'block';
-}
+    
+    const questionCard = document.getElementById('question-card');
+    const answerCard = document.getElementById('answer-card');
+    const showAnswerBtn = document.getElementById('show-answer-btn');
+    const feedbackBtns = document.getElementById('feedback-btns');
+
+    showAnswerBtn.addEventListener('click', () => {
+        
+        answerCard.classList.remove('d-none');
+        
+    
+        showAnswerBtn.classList.add('d-none');
+        feedbackBtns.classList.remove('d-none');
+    });
 </script>
+{% endblock %}

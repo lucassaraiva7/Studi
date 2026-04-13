@@ -1,30 +1,29 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+
+{% block title %}Confirmar Exclusão{% endblock %}
 
 {% block content %}
-<div style="padding: 40px; max-width: 600px; margin: auto; text-align: center; font-family: 'Inter', sans-serif;">
-    <h2 style="color: #1a1a1a;">Excluir Flashcard</h2>
-    
-    <div style="background: #fff5f5; border: 1px solid #feb2b2; padding: 20px; border-radius: 12px; margin: 20px 0;">
-        <p style="color: #c53030; font-weight: 600;">Tem certeza que deseja apagar este card?</p>
-        <p style="color: #4a5568;"><strong>Pergunta:</strong> {{ card.question }}</p>
-    </div>
+<div class="container" style="max-width: 600px;">
+    <div class="card text-center shadow-lg border-danger">
+        <div class="card-header bg-danger text-white">
+            <h2 class="mb-0">Atenção!</h2>
+        </div>
+        <div class="card-body">
+            <p class="fs-5">Você tem certeza que deseja excluir permanentemente o flashcard?</p>
+            
+            <div class="alert alert-secondary">
+                <strong>Pergunta:</strong> {{ card.question }}
+            </div>
 
- <form method="POST">
-    {% csrf_token %}
-    <input type="hidden" name="origem" value="{{ origem }}">
-    
-    <button type="submit" style="background-color: #e53e3e; ...">
-        Sim, excluir permanentemente
-    </button>
-    
-    <div style="margin-top: 20px;">
-        {% if origem == 'geral' %}
-            <a href="{% url 'lista_flashcards' %}" style="color: #666;">Cancelar e manter card</a>
-        {% else %}
-            <a href="{% url 'materia_detalhes' card.subject.id %}" style="color: #666;">Cancelar e manter card</a>
-        {% endif %}
+            <form method="post">
+                {% csrf_token %}
+                <!-- Campo oculto para manter a origem do redirecionamento -->
+                <input type="hidden" name="origem" value="{{ origem }}">
+                
+                <button type="submit" class="btn btn-danger">Sim, tenho certeza</button>
+                <a href="{{ request.META.HTTP_REFERER|default_if_none:request.get_full_path }}" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
     </div>
-</form>
-
 </div>
 {% endblock %}

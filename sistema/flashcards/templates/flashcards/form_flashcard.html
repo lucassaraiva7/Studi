@@ -1,34 +1,45 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}{{ titulo }}{% endblock %}
 
 {% block content %}
-    <h2>{{ titulo }}</h2>
-    
-    {# Só mostra o nome da matéria se ela existir, senão fica estranho #}
-    {% if materia %}
-        <p>Matéria: <strong>{{ materia.name }}</strong></p>
-    {% else %}
-        <p>Defina a matéria no formulário abaixo:</p>
-    {% endif %}
-
-    <form method="POST">
-        {% csrf_token %}
-        
-        {# Mantém a origem para a View saber para onde te mandar no POST #}
-        <input type="hidden" name="origem" value="{{ origem }}">
-
-        {{ form.as_p }}
-        
-        <div style="margin-top: 20px;">
-            <button type="submit" class="btn btn-success">Salvar Flashcard</button>
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h2 class="mb-0">{{ titulo }}</h2>
+        {% if materia %}
+        <p class="lead mb-0">Para a matéria: <strong>{{ materia.name }}</strong></p>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
             
-            {# Lógica de Cancelar Inteligente #}
-            {% if materia and origem != 'geral' %}
-                {# Se eu vim de uma matéria específica, volto para ela #}
-                <a href="{% url 'materia_detalhes' materia.id %}" class="btn btn-secondary">Cancelar</a>
-            {% else %}
-                {# Se eu vim da tela geral ou não tem matéria definida, volto para a lista de todos #}
-                <a href="{% url 'lista_flashcards' %}" class="btn btn-secondary">Cancelar</a>
+    
+            <input type="hidden" name="origem" value="{{ origem|default:'materia' }}">
+
+            {% if not materia %}
+            <div class="mb-3">
+                <label for="{{ form.subject.id_for_label }}" class="form-label">Matéria</label>
+                {% render_field form.subject class="form-select" %}
+            </div>
             {% endif %}
-        </div>
-    </form>
+
+            <div class="mb-3">
+                <label for="{{ form.question.id_for_label }}" class="form-label">Pergunta</label>
+                {% render_field form.question class="form-control" rows="3" %}
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ form.answer.id_for_label }}" class="form-label">Resposta</label>
+                {% render_field form.answer class="form-control" rows="3" %}
+            </div>
+
+            <div class="d-flex justify-content-end">
+                <a href="{{ request.META.HTTP_REFERER|default_if_none:request.get_full_path }}" class="btn btn-secondary me-2">Cancelar</a>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}
