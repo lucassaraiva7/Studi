@@ -42,17 +42,30 @@ def novo_flashcard(request, materia_id=None):
             # Se a matéria foi passada na URL, ela tem prioridade
             if materia:
                 card.subject = materia
+            
             # Garante que o card seja associado ao usuário correto através da matéria
             # (Assumindo que o form.cleaned_data['subject'] tem uma matéria do usuário)
             card.save()
             
-            # --- LÓGICA DE REDIRECIONAMENTO ---
-            # Se veio de uma página de matéria, volta pra ela.
-            if materia:
-                return redirect('materia_detalhes', pk=materia.id)
-            # Se criou a partir da lista geral, volta pra lista geral.
-            return redirect('lista_flashcards')
+            # --- CORREÇÃO DA LÓGICA DE REDIRECIONAMENTO ---
+            # Em vez de redirecionar, vamos apenas criar um novo formulário em branco
+            # para que o usuário possa adicionar outro card em seguida.
+            
+            # Prepara os dados iniciais para o novo formulário, mantendo a matéria selecionada
+            initial_data = {'subject': materia} if materia else {}
+            form = FlashcardForm(initial=initial_data)
+            # Filtra o dropdown de matérias para o novo formulário
+            form.fields['subject'].queryset = Subject.objects.filter(user=request.user)
+            
+            # Renderiza a página novamente com o formulário limpo
+            return render(request, 'flashcards/form_flashcard.html', {
+                'form': form,
+                'materia': materia,
+                'titulo': 'Novo Flashcard',
+                'mensagem_sucesso': 'Flashcard criado com sucesso! Adicione o próximo.'
+            })
     else:
+        # Se não for POST, apenas mostra o formulário em branco pela primeira vez
         initial_data = {'subject': materia} if materia else {}
         form = FlashcardForm(initial=initial_data)
         form.fields['subject'].queryset = Subject.objects.filter(user=request.user)
@@ -62,7 +75,6 @@ def novo_flashcard(request, materia_id=None):
         'materia': materia,
         'titulo': 'Novo Flashcard'
     })
-
 
 @login_required
 def editar_flashcard(request, pk):
