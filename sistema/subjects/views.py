@@ -19,7 +19,6 @@ def nova_materia(request):
         form = SubjectForm()
     return render(request, 'subjects/form_materia.html', {'form': form, 'titulo': 'Nova Matéria'})
 
-# Adicione aqui também o editar_materia e excluir_materia que te passei antes!
 
 # 2. EDITAR
 def editar_materia(request, pk):

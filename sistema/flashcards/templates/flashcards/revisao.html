@@ -1,3 +1,4 @@
+
 {% extends 'base.html' %}
 
 {% block title %}Revisando: {{ card.subject.name }}{% endblock %}
@@ -59,3 +60,289 @@
     });
 </script>
 {% endblock %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revisão - Studi SaaS</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --saas-primary: #4f46e5;
+            --saas-primary-hover: #4338ca;
+            --saas-bg: #f8fafc;
+            --saas-card-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+            --saas-text-main: #1e293b;
+            --saas-text-muted: #64748b;
+            --saas-success: #10b981;
+            --saas-danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--saas-bg);
+            color: var(--saas-text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .study-wrapper {
+            width: 100%;
+            max-width: 550px;
+            animation: fadeIn 0.4s ease-out;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .study-wrapper.loading {
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none;
+        }
+
+        .subject-info {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .subject-label {
+            display: inline-block;
+            background: white;
+            padding: 0.5rem 1.25rem;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--saas-primary);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            border: 1px solid rgba(79, 70, 229, 0.1);
+        }
+
+        .flashcard-container {
+            width: 100%;
+            height: 380px;
+            perspective: 1500px;
+            cursor: pointer;
+        }
+
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .flashcard-inner.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2.5rem;
+            border-radius: 32px;
+            background: white;
+            box-shadow: var(--saas-card-shadow);
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        .card-face-front { z-index: 2; }
+        .card-face-back { transform: rotateY(180deg); background-color: #ffffff; }
+
+        .face-label {
+            position: absolute;
+            top: 2rem;
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--saas-text-muted);
+            opacity: 0.6;
+        }
+
+        .content-text {
+            font-size: 1.6rem;
+            font-weight: 700;
+            line-height: 1.4;
+            color: var(--saas-text-main);
+        }
+
+        .btn-reveal {
+            background: var(--saas-primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 100px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-top: 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+            transition: all 0.2s;
+        }
+        .btn-reveal:hover { transform: scale(1.05); background: var(--saas-primary-hover); }
+
+        .options-wrapper {
+            margin-top: 2.5rem;
+            display: flex;
+            gap: 1.25rem;
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .options-wrapper.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .btn-option {
+            flex: 1;
+            padding: 1.25rem;
+            border-radius: 20px;
+            text-decoration: none;
+            text-align: center;
+            font-weight: 700;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .btn-option-error { background-color: #fef2f2; color: var(--saas-danger); border-color: #fee2e2; }
+        .btn-option-error:hover { background-color: var(--saas-danger); color: white; transform: translateY(-5px); box-shadow: 0 10px 20px rgba(239, 68, 68, 0.2); }
+
+        .btn-option-success { background-color: #ecfdf5; color: var(--saas-success); border-color: #d1fae5; }
+        .btn-option-success:hover { background-color: var(--saas-success); color: white; transform: translateY(-5px); box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2); }
+
+        .btn-exit { margin-top: 3rem; color: var(--saas-text-muted); text-decoration: none; font-weight: 600; font-size: 0.85rem; transition: color 0.2s; }
+        .btn-exit:hover { color: var(--saas-primary); }
+
+        /* Overlay de Carregamento */
+        #loader {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(248, 250, 252, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            backdrop-filter: blur(4px);
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .pulse { animation: pulseAnim 2s infinite; }
+        @keyframes pulseAnim { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+    <div id="loader">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Carregando...</span>
+        </div>
+    </div>
+
+    <div class="study-wrapper" id="mainWrapper">
+        <div class="subject-info">
+            <div class="subject-label">{{ card.subject.name }}</div>
+            <h1 class="h5 fw-bold mt-3 mb-0">Sessão de Estudo</h1>
+            <p class="text-muted small">Mantenha o foco no seu aprendizado</p>
+        </div>
+
+        <div class="flashcard-container" onclick="revealAnswer()">
+            <div class="flashcard-inner" id="cardInner">
+                <div class="card-face card-face-front">
+                    <div class="face-label">Pergunta</div>
+                    <div class="content-text">{{ card.question }}</div>
+                    <button class="btn-reveal pulse"><i class="fas fa-eye me-2"></i> Ver Resposta</button>
+                </div>
+
+                <div class="card-face card-face-back">
+                    <div class="face-label">Resposta</div>
+                    <div class="content-text" style="font-weight: 500; font-size: 1.4rem;">{{ card.answer }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="options-wrapper" id="optionsMenu">
+            <!-- Ao clicar, dispara o carregamento visual e redireciona -->
+            <a href="{% url 'registrar_revisao' card.id 'erro' %}" class="btn-option btn-option-error" onclick="handleResponse(event, this.href)">
+                <i class="fas fa-times-circle fs-4"></i>
+                <span>Errei</span>
+                <small>Revisar amanhã</small>
+            </a>
+            <a href="{% url 'registrar_revisao' card.id 'acerto' %}" class="btn-option btn-option-success" onclick="handleResponse(event, this.href)">
+                <i class="fas fa-check-circle fs-4"></i>
+                <span>Acertei</span>
+                <small>Dobrar intervalo</small>
+            </a>
+        </div>
+
+        <div class="text-center">
+            <a href="{% url 'lista_materias' %}" class="btn-exit"><i class="fas fa-arrow-left me-2"></i> Sair da Sessão</a>
+        </div>
+    </div>
+
+    <script>
+        let flipped = false;
+
+        function revealAnswer() {
+            if (!flipped) {
+                document.getElementById('cardInner').classList.add('is-flipped');
+                document.getElementById('optionsMenu').classList.add('show');
+                flipped = true;
+            }
+        }
+
+        // Função para forçar o redirecionamento e evitar persistência visual do card antigo
+        function handleResponse(event, url) {
+            event.preventDefault(); // Intercepta o clique
+            
+            // Ativa o estado visual de carregamento
+            document.getElementById('mainWrapper').classList.add('loading');
+            document.getElementById('loader').style.display = 'flex';
+            
+            // Redireciona o navegador para a URL do Django
+            // Isso garante que o Django processe a lógica e retorne uma NOVA página com o PRÓXIMO card
+            window.location.href = url;
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                revealAnswer();
+            }
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

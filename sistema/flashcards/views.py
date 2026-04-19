@@ -7,8 +7,7 @@ from subjects.models import Subject
 from django.db.models import Q # Import necessário para busca
 from urllib.parse import urlparse # Import para checar a URL de origem
 
-# ... (As funções lista_flashcards, novo_flashcard, editar_flashcard, excluir_flashcard permanecem as mesmas) ...
-# Para garantir, vou incluí-las no bloco de código abaixo.
+
 
 @login_required
 def lista_flashcards(request):
@@ -145,7 +144,7 @@ def sessao_revisao(request, materia_id):
         subject_id=materia_id,
         subject__user=request.user,
         next_review__lte=date.today()
-    ).order_by('?').first() # Adicionado order_by('?') para aleatoriedade
+    ).order_by('?').first() # aleatoriedade
     
     if not card:
         # Se não há mais cards, mostra a página de resultados
