@@ -176,7 +176,7 @@
     
     <!-- Breadcrumb Minimalista -->
     <nav class="breadcrumb-saas text-center">
-        <a href="{% url 'lista_materias' %}">Matérias</a>
+        <a href="{% url 'subjects:lista_materias' %}">Matérias</a>
         <span class="mx-2 text-muted">/</span>
         <span class="text-primary fw-bold">{{ titulo }}</span>
     </nav>
@@ -233,7 +233,7 @@
                     <i class="fas fa-check-circle me-2"></i> Confirmar e Salvar
                 </button>
 
-                <a href="{% url 'lista_materias' %}" class="btn btn-saas-link">
+                <a href="{% url 'subjects:lista_materias' %}" class="btn btn-saas-link">
                     <i class="fas fa-arrow-left me-2"></i> Cancelar e Voltar
                 </a>
             </form>

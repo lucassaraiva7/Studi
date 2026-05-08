@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Baralho: {{ baralho.nome }}{% endblock %}
+
+{% block content %}
+<!-- Cabeçalho da página -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-0">Baralho: {{ baralho.nome }}</h2>
+        <p class="text-muted">Matéria: {{ baralho.subject.name }}</p>
+    </div>
+    <a href="{% url 'subjects:materia_detalhes' baralho.subject.pk %}" class="btn btn-secondary">⬅️ Voltar para a Matéria</a>
+</div>
+
+<!-- Botões de Ação -->
+<div class="mb-4">
+    <a href="{% url 'flashcards:novo_flashcard' baralho.pk %}" class="btn btn-success">➕ Novo Flashcard</a>
+    <a href="{% url 'flashcards:sessao_revisao' baralho.pk %}" class="btn btn-info text-white">▶️ Estudar este Baralho</a>
+</div>
+
+<hr>
+
+<h4>Flashcards neste baralho:</h4>
+
+<!-- Lista de Flashcards -->
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-2">
+    {% for card in cards %}
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-body">
+                <p class="card-text"><strong>P:</strong> {{ card.question }}</p>
+                <p class="card-text"><strong>R:</strong> {{ card.answer }}</p>
+            </div>
+            <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
+                <small class="text-muted">Próxima revisão: {{ card.next_review|date:"d/m/Y" }}</small>
+                <div>
+                    <a href="{% url 'flashcards:editar_flashcard' card.id %}" class="btn btn-sm btn-outline-primary">✏️</a>
+                    <a href="{% url 'flashcards:excluir_flashcard' card.id %}" class="btn btn-sm btn-outline-danger">🗑️</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-warning" role="alert">
+            Nenhum flashcard criado para este baralho ainda. Que tal <a href="{% url 'flashcards:novo_flashcard' baralho.pk %}" class="alert-link">criar o primeiro</a>?
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -3,210 +3,6 @@
 {% block title %}Confirmar Exclusão{% endblock %}
 
 {% block content %}
-<div class="container" style="max-width: 600px;">
-    <div class="card text-center shadow-lg border-danger">
-        <div class="card-header bg-danger text-white">
-            <h2 class="mb-0">Atenção!</h2>
-        </div>
-        <div class="card-body">
-            <p class="fs-5">Você tem certeza que deseja excluir permanentemente o flashcard?</p>
-            
-            <div class="alert alert-secondary">
-                <strong>Pergunta:</strong> {{ card.question }}
-            </div>
-
-            <form method="post">
-                {% csrf_token %}
-                <!-- Campo oculto para manter a origem do redirecionamento -->
-                <input type="hidden" name="origem" value="{{ origem }}">
-                
-                <button type="submit" class="btn btn-danger">Sim, tenho certeza</button>
-                <a href="{{ request.META.HTTP_REFERER|default_if_none:request.get_full_path }}" class="btn btn-secondary">Cancelar</a>
-            </form>
-        </div>
-
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Excluir Flashcard - Studi SaaS</title>
-    
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <style>
-        :root {
-            --saas-danger: #ef4444;
-            --saas-danger-hover: #dc2626;
-            --saas-bg: #f8fafc;
-            --saas-card-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            --saas-text-main: #1e293b;
-            --saas-text-muted: #64748b;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--saas-bg);
-            color: var(--saas-text-main);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-        }
-
-        .delete-container {
-            width: 100%;
-            max-width: 500px;
-            animation: slideUp 0.5s ease-out;
-        }
-
-        .saas-card {
-            background: #ffffff;
-            border: 1px solid rgba(0,0,0,0.05) !important;
-            border-radius: 28px !important;
-            box-shadow: var(--saas-card-shadow) !important;
-            overflow: hidden;
-        }
-
-        .danger-accent {
-            height: 8px;
-            background: var(--saas-danger);
-            width: 100%;
-        }
-
-        .card-body-saas {
-            padding: 3rem 2rem;
-            text-align: center;
-        }
-
-        .icon-wrapper {
-            width: 80px;
-            height: 80px;
-            background-color: #fef2f2;
-            color: var(--saas-danger);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1.5rem;
-            font-size: 2rem;
-            animation: pulse-danger 2s infinite;
-        }
-
-        @keyframes pulse-danger {
-            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.2); }
-            70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-        }
-
-        .item-preview {
-            background-color: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 1.25rem;
-            margin: 1.5rem 0;
-            text-align: left;
-        }
-
-        .item-preview .label {
-            font-size: 0.65rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--saas-text-muted);
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-
-        .item-preview .content {
-            font-weight: 600;
-            color: var(--saas-text-main);
-            word-break: break-word;
-            line-height: 1.4;
-        }
-
-        .warning-box {
-            background-color: #fffbeb;
-            border-radius: 12px;
-            padding: 1rem;
-            text-align: left;
-            margin-bottom: 2rem;
-            display: flex;
-            gap: 1rem;
-            align-items: flex-start;
-        }
-
-        .warning-box i {
-            color: #d97706;
-            font-size: 1.25rem;
-            margin-top: 0.2rem;
-        }
-
-        .warning-text {
-            color: #92400e;
-            font-size: 0.85rem;
-            line-height: 1.4;
-        }
-
-        .btn-delete {
-            background-color: var(--saas-danger);
-            color: white !important;
-            border: none;
-            padding: 1rem;
-            border-radius: 14px;
-            font-weight: 700;
-            width: 100%;
-            transition: all 0.2s ease;
-            text-decoration: none;
-            display: inline-block;
-            box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);
-        }
-
-        .btn-delete:hover {
-            background-color: var(--saas-danger-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.3);
-        }
-
-        .btn-cancel {
-            color: var(--saas-text-muted);
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.9rem;
-            display: inline-block;
-            margin-top: 1.5rem;
-            transition: color 0.2s;
-        }
-
-        .btn-cancel:hover {
-            color: var(--saas-text-main);
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .badge-danger-saas {
-            background-color: #fef2f2;
-            color: var(--saas-danger);
-            font-size: 0.7rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 0.4rem 0.8rem;
-            border-radius: 8px;
-        }
-    </style>
-</head>
-<body>
-
 <div class="delete-container">
     <div class="card saas-card">
         <div class="danger-accent"></div>
@@ -243,13 +39,13 @@
                     <i class="fas fa-trash-confirm me-2"></i> Sim, excluir permanentemente
                 </button>
                 
-                <div class="text-center">
+                <div class="text-center mt-3">
                     {% if origem == 'geral' %}
-                        <a href="{% url 'lista_flashcards' %}" class="btn btn-cancel">
+                        <a href="{% url 'flashcards:lista_flashcards' %}" class="btn btn-cancel">
                             <i class="fas fa-times me-1"></i> Cancelar e manter card
                         </a>
                     {% else %}
-                        <a href="{% url 'materia_detalhes' card.subject.id %}" class="btn btn-cancel">
+                        <a href="{% url 'subjects:materia_detalhes' card.baralho.subject.pk %}" class="btn btn-cancel">
                             <i class="fas fa-times me-1"></i> Cancelar e manter card
                         </a>
                     {% endif %}
@@ -262,8 +58,4 @@
         Área de Segurança &bull; Studi SaaS
     </div>
 </div>
-
-<!-- Bootstrap 5 JS Bundle -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+{% endblock %}

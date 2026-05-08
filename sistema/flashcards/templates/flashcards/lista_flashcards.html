@@ -247,15 +247,15 @@
                 </div>
                 
                 <div class="flashcard-actions">
-                    <span class="subject-badge" style="background-color: {{ card.subject.color|default:'#4f46e5' }};">
-                        {{ card.subject.name }}
+                    <span class="subject-badge" style="background-color: {{ card.baralho.subject.color|default:'#4f46e5' }};">
+                        {{ card.baralho.subject.name }}
                     </span>
                     
-                    <a href="{% url 'editar_flashcard' card.id %}?origem=geral" class="btn-action btn-edit" title="Editar">
+                    <a href="{% url 'flashcards:editar_flashcard' card.id %}?origem=geral" class="btn-action btn-edit" title="Editar">
                         <i class="fas fa-pen"></i>
                     </a>
                     
-                    <a href="{% url 'excluir_flashcard' card.id %}?origem=geral" class="btn-action btn-delete" title="Excluir">
+                    <a href="{% url 'flashcards:excluir_flashcard' card.id %}?origem=geral" class="btn-action btn-delete" title="Excluir">
                         <i class="fas fa-trash-alt"></i>
                     </a>
                 </div>
@@ -270,7 +270,7 @@
         </ul>
     </div>
 
-    <a href="{% url 'lista_materias' %}" class="btn-back-saas">
+    <a href="{% url 'subjects:lista_materias' %}" class="btn-back-saas">
         <i class="fas fa-arrow-left"></i> Voltar para Matérias
     </a>
 

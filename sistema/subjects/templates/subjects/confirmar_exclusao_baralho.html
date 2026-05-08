@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirmar Exclusão do Baralho{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">Confirmar Exclusão</h4>
+                </div>
+                <div class="card-body">
+                    <p class="lead">Você tem certeza que deseja excluir o baralho "<strong>{{ baralho.nome }}</strong>"?</p>
+                    <p class="text-muted">Esta ação não pode ser desfeita. Todos os flashcards contidos neste baralho também serão permanentemente excluídos.</p>
+                    <hr>
+                    <form method="post">
+                        {% csrf_token %}
+                        <a href="{% url 'subjects:materia_detalhes' pk=baralho.subject.pk %}" class="btn btn-secondary"><i class="fas fa-times"></i> Cancelar</a>
+                        <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Sim, tenho certeza</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

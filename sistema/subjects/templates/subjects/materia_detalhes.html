@@ -188,7 +188,7 @@
         <nav aria-label="breadcrumb" class="mb-4 animate-fade-in">
             <ol class="breadcrumb bg-transparent p-0 m-0">
                 <li class="breadcrumb-item">
-                    <a href="{% url 'lista_materias' %}" class="text-decoration-none text-secondary-emphasis opacity-75 hover-opacity-100 transition-all">
+                    <a href="{% url 'subjects:lista_materias' %}">
                         <i class="fas fa-th-large me-1 small"></i> Dashboard
                     </a>
                 </li>
@@ -219,28 +219,65 @@
                     </div>
                     <div class="col-lg-5 text-lg-end mt-4 mt-lg-0">
                         <div class="d-flex flex-wrap gap-3 justify-content-lg-end">
-                            <a href="{% url 'sessao_revisao' materia.id %}" class="btn btn-saas-primary shadow-lg scale-on-hover">
-                                <i class="fas fa-play-circle me-2"></i>Iniciar Revisão
-                            </a>
-                            <a href="{% url 'novo_flashcard' materia.id %}" class="btn btn-saas-outline scale-on-hover">
-                                <i class="fas fa-plus-circle me-2"></i>Novo Card
-                            </a>
+                            <a href="{% url 'subjects:novo_baralho' materia_pk=materia.pk %}" class="btn btn-saas-outline scale-on-hover">
+                                    <i class="fas fa-plus-circle me-2"></i>Novo Baralho
+                                </a>
                         </div>
                     </div>
+                        <!-- Lista de Baralhos da Matéria -->
+                        {% if baralhos %}
+                            <div class="row g-4 mb-5">
+                                {% for baralho in baralhos %}
+                                    <div class="col-12 col-md-6 col-lg-4">
+                                        <div class="card h-100 border-0 shadow-sm rounded-4 saas-card transition-all overflow-hidden">
+                                                    <div class="card-body d-flex flex-column">
+                                                        <div class="d-flex w-100 justify-content-between align-items-start mb-2">
+                                                            <h5 class="card-title fw-bold text-dark-emphasis mb-0">{{ baralho.nome }}</h5>
+                                                            <div class="dropdown">
+                                                                <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown">
+                                                                    <i class="fas fa-ellipsis-v"></i>
+                                                                </button>
+                                                                <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-3">
+                                                                    <li><a class="dropdown-item small py-2" href="{% url 'subjects:baralho_detalhes' materia_pk=materia.pk baralho_pk=baralho.pk %}"><i class="fas fa-sign-in-alt me-2 opacity-50"></i>Entrar</a></li>
+                                                                    <li><a class="dropdown-item small py-2" href="{% url 'subjects:editar_baralho' materia_pk=materia.pk baralho_pk=baralho.pk %}"><i class="fas fa-pen me-2 opacity-50"></i>Editar</a></li>
+                                                                    <li><hr class="dropdown-divider opacity-50"></li>
+                                                                    <li><a class="dropdown-item small py-2 text-danger" href="{% url 'subjects:excluir_baralho' materia_pk=materia.pk baralho_pk=baralho.pk %}"><i class="fas fa-trash-can me-2 opacity-50"></i>Excluir</a></li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                        <p class="card-text text-muted small">{{ baralho.descricao }}</p>
+                                                        <div class="mt-auto d-flex gap-2">
+                                                            <a href="{% url 'flashcards:sessao_revisao' baralho.id %}" class="btn btn-saas-primary shadow-lg scale-on-hover">
+                                                                <i class="fas fa-play-circle me-2"></i>Iniciar Revisão
+                                                            </a>
+                                                            <a href="{% url 'flashcards:novo_flashcard' baralho.id %}" class="btn btn-saas-outline">
+                                                                <i class="fas fa-plus me-2"></i>Novo Flashcard
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-5">
+                                <p>Nenhum baralho cadastrado ainda.</p>
+                            </div>
+                        {% endif %}
                 </div>
             </div>
         </div>
 
-        <!-- Seção de Título da Lista -->
+        <!-- Área de estatísticas (sem listagem de cards) -->
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3 animate-slide-up">
             <div>
-                <h3 class="fw-bold h4 mb-1 text-dark-emphasis">Biblioteca de Cards</h3>
-                <p class="text-muted small mb-0">Gerencie e edite seus cartões de memória abaixo.</p>
+                <h3 class="fw-bold h4 mb-1 text-dark-emphasis">Baralhos</h3>
+                <p class="text-muted small mb-0">Gerencie seus baralhos desta matéria.</p>
             </div>
             <div class="saas-stats d-flex gap-4">
                 <div class="stat-item">
                     <span class="d-block fw-bold text-dark">{{ cards.count }}</span>
-                    <span class="text-muted extra-small text-uppercase fw-semibold">Total</span>
+                    <span class="text-muted extra-small text-uppercase fw-semibold">Cards Totais</span>
                 </div>
                 <div class="stat-divider"></div>
                 <div class="stat-item text-end">
@@ -250,70 +287,8 @@
             </div>
         </div>
 
-        <!-- Grid de Flashcards -->
-        {% if cards %}
-            <div class="row g-4 animate-staggered">
-                {% for card in cards %}
-                <div class="col-12 col-md-6 col-xl-4">
-                    <div class="card h-100 border-0 shadow-sm rounded-4 saas-card transition-all overflow-hidden">
-                        <div class="card-body p-4 d-flex flex-column">
-                            <div class="mb-4 flex-grow-1">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <span class="text-uppercase fw-bold text-primary tracking-widest extra-small">Frente</span>
-                                    <div class="dropdown">
-                                        <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown">
-                                            <i class="fas fa-ellipsis-v"></i>
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-3">
-                                            <li><a class="dropdown-item small py-2" href="{% url 'editar_flashcard' card.id %}"><i class="fas fa-pen me-2 opacity-50"></i>Editar</a></li>
-                                            <li><hr class="dropdown-divider opacity-50"></li>
-                                            <li><a class="dropdown-item small py-2 text-danger" href="{% url 'excluir_flashcard' card.id %}"><i class="fas fa-trash-can me-2 opacity-50"></i>Excluir</a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <h5 class="card-title fw-bold text-dark-emphasis lh-base mb-0">{{ card.question }}</h5>
-                            </div>
-                            
-                            <div class="saas-answer-preview p-3 rounded-4 mb-4 border-0 position-relative overflow-hidden" style="background-color: #f8fafc;">
-                                <div class="answer-accent" style="background-color: {{ materia.color }};"></div>
-                                <span class="text-uppercase fw-bold text-secondary tracking-widest extra-small d-block mb-2 opacity-75">Verso</span>
-                                <p class="mb-0 text-secondary-emphasis small lh-sm">{{ card.answer }}</p>
-                            </div>
-
-                            <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top border-light-subtle">
-                                <div class="d-flex align-items-center text-muted small">
-                                    <i class="far fa-calendar-check me-2 text-primary opacity-75"></i>
-                                    <span class="fw-medium">{{ card.next_review|date:"d M Y" }}</span>
-                                </div>
-                                <div class="action-buttons">
-                                    <a href="{% url 'editar_flashcard' card.id %}" class="btn btn-icon-saas me-1" title="Editar">
-                                        <i class="fas fa-pencil-alt"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <!-- Estado Vazio -->
-            <div class="text-center py-5 px-4 bg-white rounded-5 shadow-sm border border-dashed border-2 border-light-subtle animate-fade-in">
-                <div class="empty-state-icon mb-4">
-                    <div class="icon-circle mx-auto bg-light text-primary-emphasis shadow-inner">
-                        <i class="fas fa-layer-group fa-2x"></i>
-                    </div>
-                </div>
-                <h4 class="fw-bold text-dark-emphasis mb-2">Sua biblioteca está vazia</h4>
-                <p class="text-muted mb-4 mx-auto" style="max-width: 400px;">Adicione seu primeiro flashcard para começar a treinar sua memória com repetição espaçada.</p>
-                <a href="{% url 'novo_flashcard' materia.id %}" class="btn btn-saas-primary px-5 py-3 rounded-pill fw-bold shadow-lg">
-                    <i class="fas fa-plus-circle me-2"></i>Criar Primeiro Card
-                </a>
-            </div>
-        {% endif %}
-
         <div class="mt-5 text-center animate-fade-in">
-            <a href="{% url 'lista_materias' %}" class="btn btn-link text-decoration-none text-secondary fw-semibold hover-primary transition-all">
+            <a href="{% url 'subjects:lista_materias' %}">
                 <i class="fas fa-arrow-left me-2"></i> Painel de Matérias
             </a>
         </div>

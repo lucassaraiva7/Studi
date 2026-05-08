@@ -1,252 +1,128 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minhas Matérias - Studi SaaS</title>
-    
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+{% extends 'base.html' %}
+{% load static %}
 
-    <style>
-        :root {
-            --saas-primary: #4f46e5;
-            --saas-primary-hover: #4338ca;
-            --saas-bg: #f8fafc;
-            --saas-card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
-            --saas-text-main: #1e293b;
-            --saas-text-muted: #64748b;
-        }
+{% block title %}Minhas Matérias{% endblock %}
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--saas-bg);
-            color: var(--saas-text-main);
-            overflow-x: hidden;
-        }
-
-        .max-width-1200 { max-width: 1200px; }
-        .extra-small { font-size: 0.65rem; }
-        .tracking-widest { letter-spacing: 0.1em; }
-        .fw-extrabold { font-weight: 800; }
-        .letter-spacing-tight { letter-spacing: -0.02em; }
-
-        .dashboard-header {
-            margin-bottom: 3rem;
-        }
-
-        .btn-saas-primary {
-            background-color: var(--saas-primary);
-            color: white !important;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 12px;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
-        }
-        .btn-saas-primary:hover {
-            background-color: var(--saas-primary-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
-        }
-        .btn-saas-light {
-            background-color: white;
-            color: var(--saas-text-main) !important;
-            border: 1px solid #e2e8f0;
-            padding: 0.75rem 1.5rem;
-            border-radius: 12px;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-        }
-        .btn-saas-light:hover {
-            background-color: #f8fafc;
-            border-color: #cbd5e1;
-            transform: translateY(-2px);
-        }
-
-        .materia-card {
-            background: #ffffff;
-            border: 1px solid rgba(0,0,0,0.03) !important;
-            border-radius: 24px !important;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-        .materia-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
-        }
-
-        .materia-accent-bar {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
-        }
-
-        .icon-box {
-            width: 56px;
-            height: 56px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1.5rem;
-            transition: transform 0.3s ease;
-        }
-        .materia-card:hover .icon-box {
-            transform: scale(1.1) rotate(-5deg);
-        }
-
-        .card-footer-actions {
-            background-color: #f8fafc;
-            border-top: 1px solid #f1f5f9;
-            padding: 1.25rem;
-            margin: 0 -1.5rem -1.5rem -1.5rem;
-            border-radius: 0 0 24px 24px;
-        }
-
-        .stats-badge {
-            background: #f1f5f9;
-            color: #64748b;
-            padding: 0.35rem 0.75rem;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .animate-fade-in { animation: fadeIn 0.6s ease-out; }
-        .animate-slide-up { animation: slideUp 0.6s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        .empty-state-container {
-            padding: 5rem 2rem;
-            background: white;
-            border-radius: 32px;
-            border: 2px dashed #e2e8f0;
-        }
-
-        .dropdown-menu {
-            border: none;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-            border-radius: 12px;
-            padding: 0.5rem;
-        }
-        .dropdown-item {
-            border-radius: 8px;
-            padding: 0.6rem 1rem;
-            font-weight: 500;
-            font-size: 0.9rem;
-        }
-        .dropdown-item:hover {
-            background-color: #f1f5f9;
-        }
-
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-    </style>
-</head>
-<body>
-
-<div class="container py-5 max-width-1200">
-    
-    <div class="dashboard-header d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-4 animate-fade-in">
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <div class="d-flex align-items-center mb-2">
-                <div class="bg-primary bg-opacity-10 text-primary px-3 py-1 rounded-pill extra-small fw-bold text-uppercase tracking-widest">
-                    Área do Estudante
-                </div>
-            </div>
-            <h1 class="fw-extrabold text-dark-emphasis h2 mb-1 letter-spacing-tight">Minhas Matérias</h1>
-            <p class="text-muted mb-0">Gerencie seu conhecimento e organize seus flashcards.</p>
+            <h1 class="h2">Minhas Matérias</h1>
+            <p class="text-muted">Gerencie seu conhecimento e organize seus flashcards.</p>
         </div>
-        <div class="d-flex gap-3">
-            <a href="{% url 'estudar_tudo' %}" class="btn btn-saas-light shadow-sm">
-                <i class="fas fa-brain me-2 text-primary"></i> Revisar Tudo
+        <div>
+            <a href="{% url 'flashcards:estudar_tudo' %}" class="btn btn-outline-primary">
+                <i class="fas fa-sync-alt me-1"></i> Revisar Tudo
             </a>
-            <a href="{% url 'nova_materia' %}" class="btn btn-saas-primary">
-                <i class="fas fa-plus me-2"></i> Nova Matéria
+            <a href="{% url 'subjects:nova_materia' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i> Nova Matéria
             </a>
         </div>
     </div>
 
     <div class="row g-4">
-        {% for materia in materias %}
-        <div class="col-12 col-md-6 col-lg-4 animate-slide-up">
-            <div class="card materia-card h-100 border-0 p-4">
-                <div class="materia-accent-bar" style="background-color: {{ materia.color }};"></div>
-                
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                    <div class="icon-box" style="background-color: {{ materia.color }}15;">
-                        <i class="fas fa-book-open" style="color: {{ materia.color }}; font-size: 1.5rem;"></i>
-                    </div>
-                    <div class="dropdown">
-                        <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-ellipsis-h"></i>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="{% url 'sessao_revisao' materia.id %}"><i class="fas fa-play me-2 opacity-50"></i>Iniciar Revisão</a></li>
-                            <li><a class="dropdown-item" href="{% url 'editar_materia' materia.id %}"><i class="fas fa-edit me-2 opacity-50"></i>Editar Nome</a></li>
-                            <li><hr class="dropdown-divider opacity-50"></li>
-                            <li><a class="dropdown-item text-danger" href="{% url 'excluir_materia' materia.id %}"><i class="fas fa-trash-alt me-2 opacity-50"></i>Excluir</a></li>
-                        </ul>
+        {% if materias %}
+            {% for materia in materias %}
+                <div class="col-12 col-md-6 col-lg-4 animate-slide-up">
+                    <div class="card materia-card h-100 border-0 p-4">
+                        <div class="materia-accent-bar" style="background-color: {{ materia.color }};"></div>
+                        <div class="card-body d-flex flex-column p-0">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="icon-placeholder" style="background-color: {{ materia.color }}1A;">
+                                    <i class="fas fa-book" style="color: {{ materia.color }};"></i>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-link text-muted dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-ellipsis-h"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="{% url 'subjects:editar_materia' materia.pk %}"><i class="fas fa-edit me-2"></i> Editar</a></li>
+                                        <li><a class="dropdown-item text-danger" href="{% url 'subjects:excluir_materia' materia.pk %}"><i class="fas fa-trash me-2"></i> Excluir</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <h5 class="card-title mb-1">{{ materia.name }}</h5>
+                            <p class="card-subtitle text-muted">
+                                <i class="fas fa-layer-group me-1"></i> {{ materia.baralhos.count }} baralho{{ materia.baralhos.count|pluralize }}
+                            </p>
+                            <div class="mt-auto">
+                                <div class="card-footer mt-4 p-0 bg-transparent border-0">
+                                    <a href="{% url 'subjects:materia_detalhes' materia.pk %}" class="btn btn-ver-cards">
+                                        Ver Baralhos
+                                        <span class="play-icon">
+                                            <i class="fas fa-arrow-right"></i>
+                                        </span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <div class="mb-4">
-                    <h3 class="h5 fw-bold text-dark-emphasis mb-2">{{ materia.name }}</h3>
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="stats-badge">
-                            <i class="far fa-clone me-1"></i> {{ materia.cards.count }} cards
-                        </span>
-                    </div>
-                </div>
-
-                <div class="card-footer-actions d-flex gap-2 mt-auto">
-                    <a href="{% url 'materia_detalhes' materia.id %}" class="btn btn-saas-light flex-grow-1 py-2 rounded-3 text-sm">
-                        Ver Cards
-                    </a>
-                    <a href="{% url 'sessao_revisao' materia.id %}" class="btn btn-saas-primary flex-grow-0 px-3 py-2 rounded-3" title="Estudar Agora">
-                        <i class="fas fa-play"></i>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <h4>Nenhuma matéria encontrada.</h4>
+                    <p>Comece criando sua primeira matéria para organizar seus estudos.</p>
+                    <a href="{% url 'subjects:nova_materia' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Criar Primeira Matéria
                     </a>
                 </div>
             </div>
-        </div>
-        {% empty %}
-        <div class="col-12 animate-fade-in">
-            <div class="empty-state-container text-center">
-                <div class="mb-4">
-                    <div class="bg-light d-inline-flex align-items-center justify-content-center rounded-circle shadow-inner" style="width: 100px; height: 100px;">
-                        <i class="fas fa-folder-open fa-3x text-muted opacity-50"></i>
-                    </div>
-                </div>
-                <h3 class="fw-bold text-dark-emphasis">Nenhuma matéria por aqui</h3>
-                <p class="text-muted mb-4 mx-auto" style="max-width: 400px;">
-                    Crie sua primeira categoria de estudos para começar a organizar seus flashcards e turbinar seu aprendizado.
-                </p>
-                <a href="{% url 'nova_materia' %}" class="btn btn-saas-primary px-5 py-3 rounded-pill shadow-lg">
-                    <i class="fas fa-plus-circle me-2"></i> Criar Minha Primeira Matéria
-                </a>
-            </div>
-        </div>
-        {% endfor %}
+        {% endif %}
     </div>
 </div>
+{% endblock %}
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+{% block extra_css %}
+<style>
+    .subject-card {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    .subject-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+    .btn-icon {
+        background: transparent;
+        border: none;
+        color: #6c757d;
+    }
+    .btn-icon:hover {
+        color: #343a40;
+    }
+    .dropdown-toggle::after {
+        display: none;
+    }
+    .animate-slide-up {
+        animation: slide-up 0.5s ease-out forwards;
+    }
+    @keyframes slide-up {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .icon-placeholder {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+    .icon-placeholder i {
+        font-size: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+{# Adicionando Font Awesome para os ícones #}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+{% endblock %}
