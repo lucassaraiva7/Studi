@@ -108,15 +108,16 @@ def excluir_flashcard(request, pk):
 
 def _iniciar_contadores_revisao(request):
     referer = request.META.get('HTTP_REFERER', '')
+    # Se o usuário está vindo de fora da revisão, zeramos os contadores SRS
     if 'revisar' not in referer and 'estudar-hoje' not in referer:
-        request.session['acertos'] = 0
-        request.session['erros'] = 0
+        request.session['facil'] = 0
+        request.session['medio'] = 0
+        request.session['dificil'] = 0
 
 @login_required
-def sessao_revisao(request, baralho_id): # Alterado de materia_id para baralho_id
+def sessao_revisao(request, baralho_id):
     _iniciar_contadores_revisao(request)
     
-    # CORREÇÃO: Filtra por baralho_id, não por subject_id
     card = Flashcard.objects.filter(
         baralho_id=baralho_id,
         baralho__subject__user=request.user,
@@ -124,9 +125,19 @@ def sessao_revisao(request, baralho_id): # Alterado de materia_id para baralho_i
     ).order_by('?').first()
     
     if not card:
-        acertos = request.session.get('acertos', 0)
-        erros = request.session.get('erros', 0)
-        return render(request, 'flashcards/resultados_revisao.html', {'acertos': acertos, 'erros': erros})
+        facil = request.session.get('facil', 0)
+        medio = request.session.get('medio', 0)
+        dificil = request.session.get('dificil', 0)
+        total = facil + medio + dificil
+        
+        # DISTINÇÃO AQUI:
+        if total > 0:
+            # Se ele revisou pelo menos 1 card, mostra a tela de parabéns com stats
+            context = {'facil': facil, 'medio': medio, 'dificil': dificil, 'total': total}
+            return render(request, 'flashcards/resultados_revisao.html', context)
+        else:
+            # Se ele entrou e não tinha nada, mostra a tela de "Tudo em dia"
+            return render(request, 'flashcards/sem_cards_para_revisar.html')
         
     return render(request, 'flashcards/revisao.html', {'card': card})
 
@@ -134,26 +145,34 @@ def sessao_revisao(request, baralho_id): # Alterado de materia_id para baralho_i
 def estudar_tudo(request):
     _iniciar_contadores_revisao(request)
     
-    # CORREÇÃO: A lógica do filtro está correta, pois busca em todos os baralhos do usuário
     card = Flashcard.objects.filter(
         baralho__subject__user=request.user,
         next_review__lte=date.today()
     ).order_by('?').first()
     
     if not card:
-        acertos = request.session.get('acertos', 0)
-        erros = request.session.get('erros', 0)
-        return render(request, 'flashcards/resultados_revisao.html', {'acertos': acertos, 'erros': erros})
+        facil = request.session.get('facil', 0)
+        medio = request.session.get('medio', 0)
+        dificil = request.session.get('dificil', 0)
+        total = facil + medio + dificil
+        
+        if total > 0:
+            context = {'facil': facil, 'medio': medio, 'dificil': dificil, 'total': total}
+            return render(request, 'flashcards/resultados_revisao.html', context)
+        else:
+            return render(request, 'flashcards/sem_cards_para_revisar.html')
         
     return render(request, 'flashcards/revisao.html', {'card': card})
 
 
 @login_required
-@login_required
 def registrar_revisao(request, card_id, resultado):
     card = get_object_or_404(Flashcard, id=card_id, baralho__subject__user=request.user)
     
-    # Mapeamento de notas (grade)
+    # Incrementa o contador na sessão (facil, medio ou dificil)
+    request.session[resultado] = request.session.get(resultado, 0) + 1
+    
+    # Mapeamento de notas para o algoritmo
     if resultado == 'facil':
         grade = 5
     elif resultado == 'medio':
@@ -161,46 +180,28 @@ def registrar_revisao(request, card_id, resultado):
     else: # dificil
         grade = 3
 
-    # --- LÓGICA DE REVISÃO ESPAÇADA AJUSTADA ---
+    # --- LÓGICA SM-2 (Mantida conforme sua versão anterior) ---
     if card.repetitions == 0:
-        # PRIMEIRA VEZ QUE ESTUDA O CARD
-        if grade == 5: # Fácil
-            card.interval = 4  # Já pula para 4 dias
-        elif grade == 4: # Médio
-            card.interval = 2  # Pula para 2 dias
-        else: # Difícil
-            card.interval = 1  # Volta amanhã
+        if grade == 5: card.interval = 4
+        elif grade == 4: card.interval = 2
+        else: card.interval = 1
         card.repetitions = 1
-    
     elif card.repetitions == 1:
-        # SEGUNDA VEZ QUE ESTUDA O CARD
-        if grade == 5:
-            card.interval = 10 # Se for fácil de novo, vai longe
-        else:
-            card.interval = 6
+        if grade == 5: card.interval = 10
+        else: card.interval = 6
         card.repetitions = 2
-        
     else:
-        # A PARTIR DA TERCEIRA REVISÃO (Usa o multiplicador Ease Factor)
-        if grade == 5: # Fácil: Multiplica e dá um bônus
-            card.interval = round(card.interval * card.ease_factor * 1.2)
-        elif grade == 4: # Médio: Multiplicação padrão
-            card.interval = round(card.interval * card.ease_factor)
-        else: # Difícil: Aumenta só um pouco, independente do fator
-            card.interval = round(card.interval * 1.2)
-        
+        if grade == 5: card.interval = round(card.interval * card.ease_factor * 1.2)
+        elif grade == 4: card.interval = round(card.interval * card.ease_factor)
+        else: card.interval = round(card.interval * 1.2)
         card.repetitions += 1
 
-    # Atualiza o Fator de Facilidade (Ease Factor)
-    # Quanto mais fácil o card, mais esse fator cresce, fazendo o intervalo aumentar mais rápido no futuro
     card.ease_factor += (0.1 - (5 - grade) * (0.08 + (5 - grade) * 0.02))
-    if card.ease_factor < 1.3:
-        card.ease_factor = 1.3
+    if card.ease_factor < 1.3: card.ease_factor = 1.3
 
     card.next_review = date.today() + timedelta(days=card.interval)
     card.save()
 
-    # Salva o Log
     ReviewLog.objects.create(card=card, grade=resultado)
     
     request.session.modified = True

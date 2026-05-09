@@ -1,216 +1,189 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Revisão Concluída! - Studi SaaS</title>
-    
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+{% extends 'base.html' %}
+{% load static %}
 
-    <style>
-        :root {
-            --saas-primary: #4f46e5;
-            --saas-primary-hover: #4338ca;
-            --saas-bg: #f8fafc;
-            --saas-card-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            --saas-text-main: #1e293b;
-            --saas-text-muted: #64748b;
-            --saas-success: #10b981;
-            --saas-danger: #ef4444;
-        }
+{% block title %}Sessão Finalizada | Studi SaaS{% endblock %}
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--saas-bg);
-            color: var(--saas-text-main);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-            margin: 0;
-        }
+{% block content %}
+<div class="min-vh-100 bg-light d-flex align-items-center py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6">
+                <!-- Result Card -->
+                <div class="card border-0 shadow-lg rounded-4 overflow-hidden animate-in">
+                    <!-- Decorative Top Header -->
+                    <div class="bg-primary p-4 text-center position-relative overflow-hidden">
+                        <div class="abstract-circles"></div>
+                        <div class="position-relative z-1">
+                            <div class="icon-badge mb-3 mx-auto">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <h2 class="text-white fw-bold mb-1">Sessão Concluída!</h2>
+                            <p class="text-white-50 mb-0">Ótimo trabalho. Você está mais perto dos seus objetivos.</p>
+                        </div>
+                    </div>
 
-        .congrats-container {
-            width: 100%;
-            max-width: 550px;
-            animation: scaleUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
+                    <div class="card-body p-4 p-md-5">
+                        <!-- Score Overview -->
+                        <div class="text-center mb-5">
+                            <div class="d-inline-block p-3 bg-soft-primary rounded-pill mb-3">
+                                <span class="h4 fw-bold text-primary m-0">{{ total }}</span>
+                                <span class="text-primary-500 ms-1 small fw-medium text-uppercase">Flashcards Revisados</span>
+                            </div>
+                        </div>
 
-        .saas-card {
-            background: #ffffff;
-            border: 1px solid rgba(0,0,0,0.05) !important;
-            border-radius: 32px !important;
-            box-shadow: var(--saas-card-shadow) !important;
-            overflow: hidden;
-            text-align: center;
-            padding: 3.5rem 2rem;
-        }
+                        <!-- Stats Grid -->
+                        <div class="row g-3 mb-5">
+                            <div class="col-4">
+                                <div class="stat-box text-center p-3 rounded-4 bg-light border transition-all">
+                                    <div class="mb-2 text-success">
+                                        <i class="fas fa-smile fa-lg"></i>
+                                    </div>
+                                    <h3 class="h4 fw-bold text-dark mb-0">{{ facil }}</h3>
+                                    <span class="text-muted x-small fw-bold text-uppercase">Fácil</span>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-box text-center p-3 rounded-4 bg-light border transition-all">
+                                    <div class="mb-2 text-info">
+                                        <i class="fas fa-meh fa-lg"></i>
+                                    </div>
+                                    <h3 class="h4 fw-bold text-dark mb-0">{{ medio }}</h3>
+                                    <span class="text-muted x-small fw-bold text-uppercase">Médio</span>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-box text-center p-3 rounded-4 bg-light border transition-all">
+                                    <div class="mb-2 text-warning">
+                                        <i class="fas fa-frown fa-lg"></i>
+                                    </div>
+                                    <h3 class="h4 fw-bold text-dark mb-0">{{ dificil }}</h3>
+                                    <span class="text-muted x-small fw-bold text-uppercase">Difícil</span>
+                                </div>
+                            </div>
+                        </div>
 
-        .medal-wrapper {
-            width: 100px;
-            height: 100px;
-            background: #fffbeb;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 2rem;
-            font-size: 3rem;
-            color: #f59e0b;
-            border: 4px solid #fef3c7;
-            box-shadow: 0 10px 15px -3px rgba(245, 158, 11, 0.2);
-            animation: bounce 2s infinite;
-        }
+                        <!-- Motivational Message -->
+                        <div class="p-4 rounded-4 bg-soft-primary-light border border-primary-subtle mb-5">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="flex-shrink-0">
+                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                        <i class="fas fa-lightbulb"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="mb-0 text-slate-700 small fw-medium">
+                                        "A repetição espaçada é o segredo da memória de longo prazo. Volte amanhã para manter sua sequência!"
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
 
-        h1 {
-            font-weight: 800;
-            font-size: 2.25rem;
-            color: var(--saas-text-main);
-            margin-bottom: 1rem;
-            letter-spacing: -0.025em;
-        }
-
-        .lead-text {
-            font-size: 1.1rem;
-            color: var(--saas-text-muted);
-            margin-bottom: 2.5rem;
-            line-height: 1.6;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            margin-bottom: 3rem;
-        }
-
-        .stat-pill {
-            padding: 1.5rem;
-            border-radius: 24px;
-            border: 1px solid rgba(0,0,0,0.03);
-            transition: transform 0.2s ease;
-        }
-
-        .stat-pill:hover {
-            transform: translateY(-5px);
-        }
-
-        .stat-pill-success {
-            background-color: #ecfdf5;
-            color: var(--saas-success);
-        }
-
-        .stat-pill-danger {
-            background-color: #fef2f2;
-            color: var(--saas-danger);
-        }
-
-        .stat-value {
-            font-size: 2.5rem;
-            font-weight: 800;
-            display: block;
-            line-height: 1;
-            margin-bottom: 0.25rem;
-        }
-
-        .stat-label {
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            opacity: 0.8;
-        }
-
-        .btn-saas-primary {
-            background-color: var(--saas-primary);
-            color: white !important;
-            border: none;
-            padding: 1.25rem 2.5rem;
-            border-radius: 18px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            width: 100%;
-            transition: all 0.2s ease;
-            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn-saas-primary:hover {
-            background-color: var(--saas-primary-hover);
-            transform: translateY(-3px);
-            box-shadow: 0 20px 25px -5px rgba(79, 70, 229, 0.4);
-        }
-
-        .confetti {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background-color: #f00;
-            opacity: 0;
-        }
-
-        @keyframes scaleUp {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .footer-tag {
-            margin-top: 2rem;
-            font-size: 0.7rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.2em;
-            color: var(--saas-text-muted);
-            opacity: 0.4;
-        }
-    </style>
-</head>
-<body>
-
-<div class="congrats-container">
-    <div class="saas-card">
-        <div class="medal-wrapper">
-            <i class="fas fa-medal"></i>
-        </div>
-        
-        <h1>Revisão Concluída!</h1>
-        <p class="lead-text">Parabéns! Você revisou todos os cards que estavam pendentes hoje. Sua memória agradece.</p>
-
-        <div class="stats-grid">
-            <div class="stat-pill stat-pill-success">
-                <span class="stat-value">{{ acertos }}</span>
-                <span class="stat-label">Acertos</span>
+                        <!-- Action Buttons -->
+                        <div class="d-grid gap-3">
+                            <a href="{% url 'subjects:lista_materias' %}" class="btn btn-primary btn-lg rounded-3 py-3 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2">
+                                <i class="fas fa-home"></i> Voltar ao Dashboard
+                            </a>
+                            <a href="{% url 'flashcards:lista_flashcards' %}" class="btn btn-outline-secondary btn-lg rounded-3 py-3 fw-semibold border-2">
+                                <i class="fas fa-layer-group me-2"></i> Revisar Baralhos
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Footer Support Link -->
+                <div class="text-center mt-4">
+                    <p class="text-muted small">Precisa de ajuda? <a href="#" class="text-primary text-decoration-none fw-medium">Fale com o suporte</a></p>
+                </div>
             </div>
-            <div class="stat-pill stat-pill-danger">
-                <span class="stat-value">{{ erros }}</span>
-                <span class="stat-label">Erros</span>
-            </div>
-        </div>
-
-        <a href="{% url 'subjects:lista_materias' %}" class="btn btn-primary saas-btn">
-                <i class="fas fa-arrow-left me-2"></i>
-                Voltar para Matérias
-            </a>
-
-        <div class="footer-tag">
-            Sessão Finalizada &bull; Studi SaaS
         </div>
     </div>
 </div>
+{% endblock %}
 
-<!-- Bootstrap 5 JS Bundle -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #0061FF;
+        --primary-dark: #004ecc;
+        --slate-700: #334155;
+        --bg-soft-primary: rgba(0, 97, 255, 0.1);
+        --bg-soft-primary-light: rgba(0, 97, 255, 0.03);
+    }
+
+    body {
+        background-color: #f8fafc;
+    }
+
+    .animate-in {
+        animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(40px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .icon-badge {
+        width: 64px;
+        height: 64px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .bg-primary { background-color: var(--primary-color) !important; }
+    .text-primary { color: var(--primary-color) !important; }
+    .bg-soft-primary { background-color: var(--bg-soft-primary); }
+    .bg-soft-primary-light { background-color: var(--bg-soft-primary-light); }
+    
+    .abstract-circles {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background-image: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.1) 0%, transparent 40%),
+                          radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1) 0%, transparent 40%);
+    }
+
+    .stat-box {
+        border-color: #e2e8f0 !important;
+    }
+    .stat-box:hover {
+        background-color: white !important;
+        border-color: var(--primary-color) !important;
+        transform: translateY(-4px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    }
+
+    .x-small { font-size: 0.65rem; letter-spacing: 0.05em; }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    .btn-primary:hover {
+        background-color: var(--primary-dark);
+        border-color: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(0, 97, 255, 0.25) !important;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #f1f5f9;
+        color: var(--slate-700);
+        border-color: #cbd5e1;
+    }
+
+    .shadow-lg {
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08) !important;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+{% endblock %}
