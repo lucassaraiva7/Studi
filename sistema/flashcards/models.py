@@ -12,22 +12,26 @@ class Baralho(models.Model):
 
 # MODELO ALTERADO: Flashcard
 class Flashcard(models.Model):
-    # ALTERAÇÃO: Agora o ForeignKey aponta para Baralho, não para Subject
     baralho = models.ForeignKey(Baralho, on_delete=models.CASCADE, related_name='cards')
     question = models.TextField()
     answer = models.TextField()
     
-    # Campos de revisão permanecem os mesmos
+    # Campos de revisão técnica
     next_review = models.DateField(auto_now_add=True)
-    ease_factor = models.FloatField(default=2.5)
-    interval = models.IntegerField(default=0)
-    
+    ease_factor = models.FloatField(default=2.5) # O "EF" do algoritmo
+    interval = models.IntegerField(default=0)    # Intervalo em dias
+    repetitions = models.IntegerField(default=0) # Contagem de sucessos seguidos
+
     def __str__(self):
         return f"{self.baralho.nome} - {self.question[:20]}"
 
-# MODELO ALTERADO: ReviewLog
+
 class ReviewLog(models.Model):
-    # Nenhuma alteração aqui, mas é bom confirmar
     card = models.ForeignKey(Flashcard, on_delete=models.CASCADE)
     review_date = models.DateTimeField(auto_now_add=True)
-    success = models.BooleanField()
+    grade = models.CharField(max_length=10, default='medio') 
+
+    def __str__(self):
+        # Usando .get para evitar erros se a questão for vazia
+        question_display = self.card.question[:10] if self.card.question else "Sem pergunta"
+        return f"{question_display} - {self.grade} em {self.review_date}"

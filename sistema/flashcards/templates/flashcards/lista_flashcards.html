@@ -5,11 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Todos os Meus Flashcards - Studi SaaS</title>
     
-    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
@@ -23,7 +20,7 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: 'Inter', sans-serif;
             background-color: var(--saas-bg);
             color: var(--saas-text-main);
             min-height: 100vh;
@@ -39,16 +36,47 @@
         .header-saas {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-end;
             margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
         h2 {
             font-weight: 800;
             font-size: 1.85rem;
-            color: var(--saas-text-main);
-            margin: 0;
             letter-spacing: -0.025em;
+            margin: 0;
+        }
+
+        /* Barra de Busca */
+        .search-area {
+            flex: 1;
+            min-width: 300px;
+            max-width: 400px;
+        }
+
+        .search-input-group {
+            background: white;
+            border-radius: 16px;
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            box-shadow: var(--saas-card-shadow);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .search-input-group input {
+            border: none;
+            outline: none;
+            padding: 0.5rem;
+            width: 100%;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .search-input-group i {
+            color: var(--saas-text-muted);
         }
 
         .saas-card {
@@ -68,153 +96,72 @@
             align-items: center;
         }
 
-        .card-header-saas h5 {
-            font-weight: 700;
-            font-size: 1.1rem;
-            margin: 0;
-            color: var(--saas-text-main);
-        }
-
-        .flashcard-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
         .flashcard-item {
             padding: 1.5rem 2rem;
             border-bottom: 1px solid #f1f5f9;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: background-color 0.2s ease;
+            transition: all 0.2s ease;
         }
 
-        .flashcard-item:last-child {
-            border-bottom: none;
-        }
+        .flashcard-item:hover { background-color: #f8fafc; }
 
-        .flashcard-item:hover {
-            background-color: #f8fafc;
-        }
-
-        .flashcard-content {
-            flex: 1;
-            padding-right: 2rem;
-        }
+        .flashcard-content { flex: 1; padding-right: 1.5rem; }
 
         .question-preview {
             font-weight: 700;
             font-size: 1rem;
             color: var(--saas-text-main);
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.2rem;
             display: block;
         }
 
-        .answer-preview {
-            font-size: 0.875rem;
-            color: var(--saas-text-muted);
-            display: block;
-        }
-
-        .flashcard-actions {
+        /* Badge de Revisão */
+        .review-info {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .review-date {
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            background: #f1f5f9;
+            color: var(--saas-text-muted);
+        }
+
+        .review-vencida {
+            background: #fef2f2;
+            color: #ef4444;
+            font-weight: 700;
         }
 
         .subject-badge {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 0.4rem 0.8rem;
+            padding: 0.3rem 0.7rem;
             border-radius: 8px;
             color: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .btn-action {
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 10px;
-            transition: all 0.2s ease;
-            text-decoration: none;
-            font-size: 0.9rem;
+            width: 36px; height: 36px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 10px; text-decoration: none; font-size: 0.9rem;
         }
 
-        .btn-edit {
-            background-color: #f1f5f9;
-            color: var(--saas-text-muted);
-        }
+        .btn-edit { background-color: #f1f5f9; color: var(--saas-text-muted); }
+        .btn-edit:hover { background-color: var(--saas-primary); color: white; transform: translateY(-2px); }
 
-        .btn-edit:hover {
-            background-color: var(--saas-primary);
-            color: white;
-            transform: translateY(-2px);
-        }
+        .btn-delete { background-color: #fef2f2; color: #ef4444; }
+        .btn-delete:hover { background-color: #ef4444; color: white; transform: translateY(-2px); }
 
-        .btn-delete {
-            background-color: #fef2f2;
-            color: #ef4444;
-        }
-
-        .btn-delete:hover {
-            background-color: #ef4444;
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .empty-state {
-            padding: 4rem 2rem;
-            text-align: center;
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-            color: #e2e8f0;
-            margin-bottom: 1.5rem;
-        }
-
-        .btn-back-saas {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--saas-text-muted);
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: color 0.2s;
-            margin-top: 2rem;
-        }
-
-        .btn-back-saas:hover {
-            color: var(--saas-primary);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Responsividade */
-        @media (max-width: 600px) {
-            .flashcard-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1.25rem;
-            }
-            .flashcard-content {
-                padding-right: 0;
-            }
-            .flashcard-actions {
-                width: 100%;
-                justify-content: space-between;
-            }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -222,35 +169,53 @@
 <div class="container-saas">
     
     <div class="header-saas">
-        <h2>Todos os Meus Flashcards</h2>
-        <div class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 fw-bold" style="font-size: 0.8rem;">
-            {{ cards|length }} Cards Totais
+        <div>
+            <h2>Meus Flashcards</h2>
+            <div class="text-muted small fw-medium">{{ cards|length }} Cards cadastrados no total</div>
+        </div>
+        
+        <div class="search-area">
+            <form method="GET" action="{% url 'flashcards:lista_flashcards' %}">
+                <div class="search-input-group">
+                    <i class="fas fa-search"></i>
+                    <input type="text" name="q" placeholder="Buscar por pergunta ou resposta..." value="{{ query }}">
+                </div>
+            </form>
         </div>
     </div>
 
     <div class="saas-card">
         <div class="card-header-saas">
-            <h5>Lista de Cards</h5>
-            <i class="fas fa-layer-group text-muted opacity-50"></i>
+            <h5 class="m-0 fw-bold">Lista de Cards</h5>
+            <span class="badge bg-primary-subtle text-primary rounded-pill px-3 fw-bold">SRS Algoritmo Ativo</span>
         </div>
         
-        <ul class="flashcard-list">
+        <ul class="list-unstyled m-0">
             {% for card in cards %}
             <li class="flashcard-item">
                 <div class="flashcard-content">
-                    <span class="question-preview">
-                        <span class="text-primary opacity-50 me-1">P:</span> {{ card.question|truncatechars:80 }}
-                    </span>
-                    <span class="answer-preview">
-                        <span class="fw-bold text-muted me-1">R:</span> {{ card.answer|truncatechars:80 }}
-                    </span>
+                    <span class="question-preview">{{ card.question|truncatechars:70 }}</span>
+                    
+                    <div class="d-flex align-items: center; gap-2 flex-wrap">
+                        <span class="subject-badge" style="background-color: {{ card.baralho.subject.color|default:'#4f46e5' }};">
+                            {{ card.baralho.subject.name }}
+                        </span>
+
+                        <div class="review-info">
+                            <i class="far fa-calendar-alt"></i>
+                            <span>Próxima revisão:</span>
+                            <span class="review-date {% if card.next_review <= today %}review-vencida{% endif %}">
+                                {% if card.next_review <= today %}
+                                    Hoje / Vencido
+                                {% else %}
+                                    {{ card.next_review|date:"d/m/Y" }}
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="flashcard-actions">
-                    <span class="subject-badge" style="background-color: {{ card.baralho.subject.color|default:'#4f46e5' }};">
-                        {{ card.baralho.subject.name }}
-                    </span>
-                    
+                <div class="d-flex gap-2">
                     <a href="{% url 'flashcards:editar_flashcard' card.id %}?origem=geral" class="btn-action btn-edit" title="Editar">
                         <i class="fas fa-pen"></i>
                     </a>
@@ -261,25 +226,20 @@
                 </div>
             </li>
             {% empty %}
-            <div class="empty-state">
-                <i class="fas fa-clone"></i>
-                <h5 class="fw-bold text-dark">Nenhum flashcard encontrado</h5>
-                <p class="text-muted small">Crie sua primeira matéria para começar a adicionar cards.</p>
+            <div class="text-center py-5">
+                <i class="fas fa-search text-muted opacity-25 mb-3" style="font-size: 3rem;"></i>
+                <h5 class="fw-bold text-dark">Nenhum resultado encontrado</h5>
+                <p class="text-muted small">Tente usar outros termos de busca ou crie novos cards.</p>
             </div>
             {% endfor %}
         </ul>
     </div>
 
-    <a href="{% url 'subjects:lista_materias' %}" class="btn-back-saas">
+    <a href="{% url 'subjects:lista_materias' %}" class="btn btn-link btn-back-saas p-0 mt-4">
         <i class="fas fa-arrow-left"></i> Voltar para Matérias
     </a>
-
-    <div class="text-center mt-5 text-muted extra-small opacity-50 fw-bold text-uppercase tracking-widest" style="font-size: 0.65rem;">
-        Gestão Centralizada &bull; Studi SaaS
-    </div>
 </div>
 
-<!-- Bootstrap 5 JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -5,29 +5,37 @@ from .models import Flashcard, ReviewLog, Baralho
 from .forms import FlashcardForm
 from django.db.models import Q
 from urllib.parse import urlparse
+from datetime import date  
+
 
 @login_required
 def lista_flashcards(request):
-    # Esta view agora precisa buscar por baralho, não matéria
     query = request.GET.get('q', '')
     baralho_id = request.GET.get('baralho', '')
 
+    # 1. Começamos filtrando pelos cards do usuário logado
     cards = Flashcard.objects.filter(baralho__subject__user=request.user)
 
+    # 2. Filtro de busca (Lupa)
     if query:
         cards = cards.filter(Q(question__icontains=query) | Q(answer__icontains=query))
+    
+    # 3. Filtro por Baralho
     if baralho_id:
         cards = cards.filter(baralho_id=baralho_id)
+
+    # 4. Ordenação: Mostra primeiro os cards que precisam ser revisados antes
+    cards = cards.order_by('next_review')
 
     baralhos = Baralho.objects.filter(subject__user=request.user)
 
     return render(request, 'flashcards/lista_flashcards.html', {
         'cards': cards,
-        'baralhos': baralhos, # Enviando baralhos para o filtro
+        'baralhos': baralhos,
         'query': query,
-        'baralho_selecionado': baralho_id
+        'baralho_selecionado': baralho_id,
+        'today': date.today()  # <--- MUITO IMPORTANTE: Envia a data de hoje para o template
     })
-
 
 @login_required
 def novo_flashcard(request, baralho_id=None):
@@ -139,36 +147,61 @@ def estudar_tudo(request):
         
     return render(request, 'flashcards/revisao.html', {'card': card})
 
+
+@login_required
 @login_required
 def registrar_revisao(request, card_id, resultado):
     card = get_object_or_404(Flashcard, id=card_id, baralho__subject__user=request.user)
     
-    if resultado == 'acerto':
-        request.session['acertos'] = request.session.get('acertos', 0) + 1
-        success = True
-    else:
-        request.session['erros'] = request.session.get('erros', 0) + 1
-        success = False
+    # Mapeamento de notas (grade)
+    if resultado == 'facil':
+        grade = 5
+    elif resultado == 'medio':
+        grade = 4
+    else: # dificil
+        grade = 3
 
-    if success:
-        if card.interval == 0: card.interval = 1
-        elif card.interval == 1: card.interval = 6
-        else: card.interval = round(card.interval * card.ease_factor)
-        card.ease_factor += 0.1
+    # --- LÓGICA DE REVISÃO ESPAÇADA AJUSTADA ---
+    if card.repetitions == 0:
+        # PRIMEIRA VEZ QUE ESTUDA O CARD
+        if grade == 5: # Fácil
+            card.interval = 4  # Já pula para 4 dias
+        elif grade == 4: # Médio
+            card.interval = 2  # Pula para 2 dias
+        else: # Difícil
+            card.interval = 1  # Volta amanhã
+        card.repetitions = 1
+    
+    elif card.repetitions == 1:
+        # SEGUNDA VEZ QUE ESTUDA O CARD
+        if grade == 5:
+            card.interval = 10 # Se for fácil de novo, vai longe
+        else:
+            card.interval = 6
+        card.repetitions = 2
+        
     else:
-        card.interval = 0
-        card.ease_factor = max(1.3, card.ease_factor - 0.2)
+        # A PARTIR DA TERCEIRA REVISÃO (Usa o multiplicador Ease Factor)
+        if grade == 5: # Fácil: Multiplica e dá um bônus
+            card.interval = round(card.interval * card.ease_factor * 1.2)
+        elif grade == 4: # Médio: Multiplicação padrão
+            card.interval = round(card.interval * card.ease_factor)
+        else: # Difícil: Aumenta só um pouco, independente do fator
+            card.interval = round(card.interval * 1.2)
+        
+        card.repetitions += 1
+
+    # Atualiza o Fator de Facilidade (Ease Factor)
+    # Quanto mais fácil o card, mais esse fator cresce, fazendo o intervalo aumentar mais rápido no futuro
+    card.ease_factor += (0.1 - (5 - grade) * (0.08 + (5 - grade) * 0.02))
+    if card.ease_factor < 1.3:
+        card.ease_factor = 1.3
 
     card.next_review = date.today() + timedelta(days=card.interval)
     card.save()
-    # Registrar no log de revisões
-    try:
-        ReviewLog.objects.create(card=card, success=success)
-    except Exception:
-        # Falha em criar log não deve bloquear fluxo principal
-        pass
-    # Garantir que alterações na sessão sejam persistidas
-    request.session.modified = True
 
-    # Após registrar, redirecionar para a sessão de revisão do mesmo baralho
+    # Salva o Log
+    ReviewLog.objects.create(card=card, grade=resultado)
+    
+    request.session.modified = True
     return redirect('flashcards:sessao_revisao', baralho_id=card.baralho.pk)
