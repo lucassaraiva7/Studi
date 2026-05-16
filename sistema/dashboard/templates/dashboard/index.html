@@ -3,6 +3,8 @@
 {% block title %}Dashboard de Estudos — Studi{% endblock %}
 
 {% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
     :root {
         --studi-primary: #4f46e5;
@@ -18,7 +20,6 @@
         margin-bottom: 2.5rem;
     }
 
-    /* Cards de Resumo Geral */
     .stat-card {
         background: var(--studi-bg-card);
         border: 1px solid #e2e8f0;
@@ -39,7 +40,6 @@
         font-size: 1.25rem;
     }
 
-    /* Lista de Matérias */
     .materia-status-card {
         background: white;
         border: 1px solid #e2e8f0;
@@ -57,7 +57,6 @@
         height: 100%;
     }
 
-    /* Timeline do Histórico */
     .timeline-stream {
         border-left: 2px solid #e2e8f0;
         padding-left: 1.5rem;
@@ -81,6 +80,15 @@
     .timeline-item.facil::before { background: var(--studi-success); }
     .timeline-item.medio::before { background: var(--studi-warning); }
     .timeline-item.dificil::before { background: var(--studi-danger); }
+
+    /* Estilo customizado para o contêiner do gráfico */
+    .chart-container-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 24px;
+        padding: 2rem;
+        margin-bottom: 2.5rem;
+    }
 </style>
 
 <div class="container py-4">
@@ -89,7 +97,10 @@
             <h1 class="fw-800 h2 mb-1 text-dark-emphasis">Painel de Estudos</h1>
             <p class="text-muted mb-0">Acompanhe seu progresso e métricas de retenção.</p>
         </div>
-        <div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'flashcards:estudar_tudo' %}" class="btn btn-success rounded-pill px-4 fw-bold shadow-sm">
+                <i class="fas fa-play me-2"></i> Revisar Tudo
+            </a>
             <a href="{% url 'subjects:lista_materias' %}" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
                 <i class="fas fa-book me-2"></i> Gerenciar Matérias
             </a>
@@ -146,15 +157,20 @@
         </div>
     </div>
 
+    <div class="chart-container-card shadow-sm">
+        <h3 class="fw-bold h5 mb-3 text-dark-emphasis">Histórico de Revisões Semanal</h3>
+        <div style="position: relative; height: 220px; width: 100%;">
+            <canvas id="revisoesChart"></canvas>
+        </div>
+    </div>
+
     <div class="row g-4">
         <div class="col-12 col-lg-8">
             <h3 class="fw-bold h4 mb-4 text-dark-emphasis">Progresso de Aprendizagem</h3>
-            
             {% if materias_stats %}
                 {% for materia in materias_stats %}
                 <div class="materia-status-card shadow-sm">
                     <div class="materia-badge-status" style="background-color: {{ materia.color }};"></div>
-                    
                     <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
                         <div>
                             <h5 class="fw-bold mb-1 text-dark">{{ materia.name }}</h5>
@@ -162,7 +178,6 @@
                                 <i class="fas fa-folder me-1 opacity-50"></i>{{ materia.total_baralhos }} baralho{{ materia.total_baralhos|pluralize }}
                             </span>
                         </div>
-                        
                         <div class="text-end">
                             {% if forloop.first and materia.total_cards > 0 and materia.media_facilidade < 2.2 %}
                                 <span class="badge bg-danger-subtle text-danger rounded-pill px-2 py-1 small fw-bold mb-1 d-inline-block">
@@ -203,7 +218,6 @@
 
         <div class="col-12 col-lg-4">
             <h3 class="fw-bold h4 mb-4 text-dark-emphasis">Atividade Recente</h3>
-            
             <div class="card border-0 shadow-sm rounded-4 p-4">
                 {% if historico_recente %}
                     <div class="timeline-stream">
@@ -230,4 +244,64 @@
         </div>
     </div>
 </div>
+
+<script>
+    const ctx = document.getElementById('revisoesChart').getContext('2d');
+    
+    // Pegando as variáveis do Django passadas pelo Contexto
+    const labelsDias = {{ chart_labels|safe }};
+    const dadosTotais = {{ chart_totals }};
+    const dadosFaceis = {{ chart_facil }};
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labelsDias,
+            datasets: [
+                {
+                    label: 'Cards Revisados',
+                    data: dadosTotais,
+                    backgroundColor: '#4f46e5',
+                    borderRadius: 6,
+                    borderSkipped: false,
+                },
+                {
+                    label: 'Marcados como Fácil',
+                    data: dadosFaceis,
+                    backgroundColor: '#10b981',
+                    borderRadius: 6,
+                    borderSkipped: false,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: { boxWidth: 12, font: { weight: 600 } }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    backgroundColor: '#0f172a',
+                    titleFont: { size: 13 },
+                    bodyFont: { size: 12 },
+                    padding: 10,
+                    cornerRadius: 8,
+                }
+            },
+            scales: {
+                x: { grid: { display: false } },
+                y: { 
+                    beginAtZero: true,
+                    ticks: { precision: 0 },
+                    grid: { color: '#f1f5f9' }
+                }
+            }
+        }
+    });
+</script>
 {% endblock %}

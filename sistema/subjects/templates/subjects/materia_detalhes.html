@@ -1,301 +1,223 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ materia.name }} - Studi SaaS</title>
+{% extends 'base.html' %}
+
+{% block title %}{{ materia.name }} - Studi SaaS{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --saas-primary: #4f46e5;
+        --saas-primary-hover: #4338ca;
+        --saas-card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+    }
+
+    .max-width-1100 { max-width: 1100px; }
+    .extra-small { font-size: 0.65rem; }
+    .tracking-widest { letter-spacing: 0.1em; }
+    .tracking-wider { letter-spacing: 0.05em; }
+    .fw-extrabold { font-weight: 800; }
+    .letter-spacing-tight { letter-spacing: -0.02em; }
+
+    /* Hero SaaS Styles */
+    .saas-hero {
+        background: #ffffff;
+        border: 1px solid rgba(0,0,0,0.03) !important;
+    }
+    .hero-accent {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 6px;
+    }
+
+    /* Buttons SaaS */
+    .btn-saas-primary {
+        background-color: var(--saas-primary);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.75rem;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+    .btn-saas-primary:hover {
+        background-color: var(--saas-primary-hover);
+        color: white;
+        transform: translateY(-2px);
+    }
+    .btn-saas-outline {
+        background-color: transparent;
+        color: #475569;
+        border: 1.5px solid #e2e8f0;
+        padding: 0.75rem 1.75rem;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+    .btn-saas-outline:hover {
+        background-color: #f8fafc;
+        border-color: #cbd5e1;
+        transform: translateY(-2px);
+    }
+
+    /* Cards SaaS */
+    .saas-card {
+        background: #ffffff;
+        border: 1px solid rgba(0,0,0,0.03) !important;
+        box-shadow: var(--saas-card-shadow) !important;
+    }
+    .saas-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+    }
+
+    /* Pulse & Icons */
+    .pulse-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.2); }
+        70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(0, 0, 0, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); }
+    }
+
+    /* Stats */
+    .stat-divider {
+        width: 1px;
+        height: 30px;
+        background: #e2e8f0;
+        align-self: center;
+    }
+
+    /* Animations */
+    .animate-fade-in { animation: fadeIn 0.6s ease-out; }
+    .animate-slide-up { animation: slideUp 0.6s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    .transition-all { transition: all 0.3s ease; }
+    .scale-on-hover:active { transform: scale(0.95); }
+</style>
+
+<div class="container max-width-1100 py-4">
     
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <nav aria-label="breadcrumb" class="mb-4 animate-fade-in">
+        <ol class="breadcrumb bg-transparent p-0 m-0">
+            <li class="breadcrumb-item">
+                <a href="{% url 'dashboard:index' %}" class="text-decoration-none">
+                    <i class="fas fa-chart-pie me-1 small"></i> Dashboard
+                </a>
+            </li>
+            <li class="breadcrumb-item active fw-semibold text-primary" aria-current="page">
+                {{ materia.name }}
+            </li>
+        </ol>
+    </nav>
 
-    <style>
-        :root {
-            --saas-primary: #4f46e5;
-            --saas-primary-hover: #4338ca;
-            --saas-bg: #f8fafc;
-            --saas-card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--saas-bg);
-            color: #1e293b;
-        }
-
-        .max-width-1100 { max-width: 1100px; }
-        .extra-small { font-size: 0.65rem; }
-        .tracking-widest { letter-spacing: 0.1em; }
-        .tracking-wider { letter-spacing: 0.05em; }
-        .fw-extrabold { font-weight: 800; }
-        .letter-spacing-tight { letter-spacing: -0.02em; }
-
-        /* Hero SaaS Styles */
-        .saas-hero {
-            background: #ffffff;
-            border: 1px solid rgba(0,0,0,0.03) !important;
-        }
-        .hero-accent {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 6px;
-        }
-
-        /* Buttons SaaS */
-        .btn-saas-primary {
-            background-color: var(--saas-primary);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.75rem;
-            border-radius: 12px;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .btn-saas-primary:hover {
-            background-color: var(--saas-primary-hover);
-            color: white;
-            transform: translateY(-2px);
-        }
-        .btn-saas-outline {
-            background-color: transparent;
-            color: #475569;
-            border: 1.5px solid #e2e8f0;
-            padding: 0.75rem 1.75rem;
-            border-radius: 12px;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .btn-saas-outline:hover {
-            background-color: #f8fafc;
-            border-color: #cbd5e1;
-            transform: translateY(-2px);
-        }
-        .btn-icon-saas {
-            width: 36px;
-            height: 36px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 10px;
-            color: #94a3b8;
-            transition: all 0.2s;
-            border: 1px solid transparent;
-            text-decoration: none;
-        }
-        .btn-icon-saas:hover {
-            background: #f1f5f9;
-            color: var(--saas-primary);
-            border-color: #e2e8f0;
-        }
-
-        /* Cards SaaS */
-        .saas-card {
-            background: #ffffff;
-            border: 1px solid rgba(0,0,0,0.03) !important;
-            box-shadow: var(--saas-card-shadow) !important;
-        }
-        .saas-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
-        }
-
-        .saas-answer-preview {
-            border-left: 0 !important;
-        }
-        .answer-accent {
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            border-radius: 4px 0 0 4px;
-        }
-
-        /* Pulse & Icons */
-        .pulse-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.2); }
-            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(0, 0, 0, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); }
-        }
-
-        .icon-circle {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Stats */
-        .stat-divider {
-            width: 1px;
-            height: 30px;
-            background: #e2e8f0;
-            align-self: center;
-        }
-
-        /* Animations */
-        .animate-fade-in {
-            animation: fadeIn 0.6s ease-out;
-        }
-        .animate-slide-up {
-            animation: slideUp 0.6s ease-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .hover-opacity-100:hover { opacity: 1 !important; }
-        .transition-all { transition: all 0.3s ease; }
-        .scale-on-hover:active { transform: scale(0.95); }
-        .hover-primary:hover { color: var(--saas-primary) !important; }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-    </style>
-</head>
-<body>
-
-<div class="saas-wrapper min-vh-100 bg-light-subtle py-5">
-    <div class="container max-width-1100">
-        
-        <!-- Breadcrumb -->
-        <nav aria-label="breadcrumb" class="mb-4 animate-fade-in">
-            <ol class="breadcrumb bg-transparent p-0 m-0">
-                <li class="breadcrumb-item">
-                    <a href="{% url 'subjects:lista_materias' %}">
-                        <i class="fas fa-th-large me-1 small"></i> Dashboard
-                    </a>
-                </li>
-                <li class="breadcrumb-item active fw-semibold text-primary" aria-current="page">
-                    {{ materia.name }}
-                </li>
-            </ol>
-        </nav>
-
-        <!-- Header Hero -->
-        <div class="saas-hero card border-0 shadow-sm rounded-5 mb-5 overflow-hidden position-relative">
-            <div class="hero-accent" style="background: linear-gradient(90deg, {{ materia.color }}, {{ materia.color }}cc);"></div>
-            <div class="card-body p-4 p-md-5">
-                <div class="row align-items-center">
-                    <div class="col-lg-7">
-                        <div class="d-inline-flex align-items-center mb-3 px-3 py-1 rounded-pill" style="background-color: {{ materia.color }}15; border: 1px solid {{ materia.color }}30;">
-                            <span class="pulse-dot me-2" style="background-color: {{ materia.color }};"></span>
-                            <span class="fw-bold text-uppercase tracking-wider extra-small" style="color: {{ materia.color }};">Módulo Ativo</span>
-                        </div>
-                        <h1 class="display-5 fw-extrabold text-dark-emphasis mb-3 letter-spacing-tight">
-                            {{ materia.name }}
-                        </h1>
-                        <p class="text-secondary fs-5 mb-0 opacity-75">
-                            <span class="badge bg-white text-dark border shadow-sm rounded-pill px-3 py-2 fw-medium">
-                                <i class="fas fa-layer-group me-2 text-primary"></i>{{ cards.count }} Flashcards
-                            </span>
-                        </p>
+    <div class="saas-hero card border-0 shadow-sm rounded-5 mb-5 overflow-hidden position-relative animate-fade-in">
+        <div class="hero-accent" style="background: linear-gradient(90deg, {{ materia.color }}, {{ materia.color }}cc);"></div>
+        <div class="card-body p-4 p-md-5">
+            <div class="row align-items-center">
+                <div class="col-lg-7">
+                    <div class="d-inline-flex align-items-center mb-3 px-3 py-1 rounded-pill" style="background-color: {{ materia.color }}15; border: 1px solid {{ materia.color }}30;">
+                        <span class="pulse-dot me-2" style="background-color: {{ materia.color }};"></span>
+                        <span class="fw-bold text-uppercase tracking-wider extra-small" style="color: {{ materia.color }};">Módulo Ativo</span>
                     </div>
-                    <div class="col-lg-5 text-lg-end mt-4 mt-lg-0">
-                        <div class="d-flex flex-wrap gap-3 justify-content-lg-end">
-                            <a href="{% url 'subjects:novo_baralho' materia_pk=materia.pk %}" class="btn btn-saas-outline scale-on-hover">
-                                    <i class="fas fa-plus-circle me-2"></i>Novo Baralho
-                                </a>
-                        </div>
+                    <h1 class="display-5 fw-extrabold text-dark-emphasis mb-3 letter-spacing-tight">
+                        {{ materia.name }}
+                    </h1>
+                    <p class="text-secondary fs-5 mb-0 opacity-75">
+                        <span class="badge bg-white text-dark border shadow-sm rounded-pill px-3 py-2 fw-medium">
+                            <i class="fas fa-layer-group me-2 text-primary"></i>{{ cards.count }} Flashcards
+                        </span>
+                    </p>
+                </div>
+                <div class="col-lg-5 text-lg-end mt-4 mt-lg-0">
+                    <div class="d-flex flex-wrap gap-3 justify-content-lg-end">
+                        <a href="{% url 'subjects:novo_baralho' materia_pk=materia.pk %}" class="btn btn-saas-outline scale-on-hover">
+                            <i class="fas fa-plus-circle me-2"></i>Novo Baralho
+                        </a>
                     </div>
-                        <!-- Lista de Baralhos da Matéria -->
-                        {% if baralhos %}
-                            <div class="row g-4 mb-5">
-                                {% for baralho in baralhos %}
-                                    <div class="col-12 col-md-6 col-lg-4">
-                                        <div class="card h-100 border-0 shadow-sm rounded-4 saas-card transition-all overflow-hidden">
-                                                    <div class="card-body d-flex flex-column">
-                                                        <div class="d-flex w-100 justify-content-between align-items-start mb-2">
-                                                            <h5 class="card-title fw-bold text-dark-emphasis mb-0">{{ baralho.nome }}</h5>
-                                                            <div class="dropdown">
-                                                                <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown">
-                                                                    <i class="fas fa-ellipsis-v"></i>
-                                                                </button>
-                                                                <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-3">
-                                                                    <li><a class="dropdown-item small py-2" href="{% url 'subjects:baralho_detalhes' materia_pk=materia.pk baralho_pk=baralho.pk %}"><i class="fas fa-sign-in-alt me-2 opacity-50"></i>Entrar</a></li>
-                                                                    <li><a class="dropdown-item small py-2" href="{% url 'subjects:editar_baralho' materia_pk=materia.pk baralho_pk=baralho.pk %}"><i class="fas fa-pen me-2 opacity-50"></i>Editar</a></li>
-                                                                    <li><hr class="dropdown-divider opacity-50"></li>
-                                                                    <li><a class="dropdown-item small py-2 text-danger" href="{% url 'subjects:excluir_baralho' materia_pk=materia.pk baralho_pk=baralho.pk %}"><i class="fas fa-trash-can me-2 opacity-50"></i>Excluir</a></li>
-                                                                </ul>
-                                                            </div>
-                                                        </div>
-                                                        <p class="card-text text-muted small">{{ baralho.descricao }}</p>
-                                                        <div class="mt-auto d-flex gap-2">
-                                                            <a href="{% url 'flashcards:sessao_revisao' baralho.id %}" class="btn btn-saas-primary shadow-lg scale-on-hover">
-                                                                <i class="fas fa-play-circle me-2"></i>Iniciar Revisão
-                                                            </a>
-                                                            <a href="{% url 'flashcards:novo_flashcard' baralho.id %}" class="btn btn-saas-outline">
-                                                                <i class="fas fa-plus me-2"></i>Novo Flashcard
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            <div class="text-center py-5">
-                                <p>Nenhum baralho cadastrado ainda.</p>
-                            </div>
-                        {% endif %}
                 </div>
             </div>
-        </div>
-
-        <!-- Área de estatísticas (sem listagem de cards) -->
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3 animate-slide-up">
-            <div>
-                <h3 class="fw-bold h4 mb-1 text-dark-emphasis">Baralhos</h3>
-                <p class="text-muted small mb-0">Gerencie seus baralhos desta matéria.</p>
-            </div>
-            <div class="saas-stats d-flex gap-4">
-                <div class="stat-item">
-                    <span class="d-block fw-bold text-dark">{{ cards.count }}</span>
-                    <span class="text-muted extra-small text-uppercase fw-semibold">Cards Totais</span>
-                </div>
-                <div class="stat-divider"></div>
-                <div class="stat-item text-end">
-                    <span class="d-block fw-bold text-success">100%</span>
-                    <span class="text-muted extra-small text-uppercase fw-semibold">Retenção</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="mt-5 text-center animate-fade-in">
-            <a href="{% url 'subjects:lista_materias' %}">
-                <i class="fas fa-arrow-left me-2"></i> Painel de Matérias
-            </a>
         </div>
     </div>
-</div>
 
-<!-- Bootstrap 5 JS Bundle -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3 animate-slide-up">
+        <div>
+            <h3 class="fw-bold h4 mb-1 text-dark-emphasis">Baralhos</h3>
+            <p class="text-muted small mb-0">Gerencie seus baralhos desta matéria.</p>
+        </div>
+        <div class="saas-stats d-flex gap-4">
+            <div class="stat-item">
+                <span class="d-block fw-bold text-dark text-end">{{ baralhos|length }}</span>
+                <span class="text-muted extra-small text-uppercase fw-semibold">Baralhos</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item text-end">
+                <span class="d-block fw-bold text-dark">{{ cards.count }}</span>
+                <span class="text-muted extra-small text-uppercase fw-semibold">Cards Totais</span>
+            </div>
+        </div>
+    </div>
+
+    {% if baralhos %}
+        <div class="row g-4 mb-5 animate-slide-up">
+            {% for baralho in baralhos %}
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 saas-card transition-all overflow-hidden">
+                        <div class="card-body d-flex flex-column p-4">
+                            <div class="d-flex w-100 justify-content-between align-items-start mb-2">
+                                <h5 class="card-title fw-bold text-dark-emphasis mb-0 me-2">{{ baralho.nome }}</h5>
+                                
+                                <div class="dropdown">
+                                    <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-3">
+                                        <li><a class="dropdown-item small py-2" href="{% url 'subjects:baralho_detalhes' materia_pk=materia.pk baralho_pk=baralho.pk %}"><i class="fas fa-sign-in-alt me-2 opacity-50"></i>Entrar</a></li>
+                                        <li><a class="dropdown-item small py-2" href="{% url 'subjects:editar_baralho' materia_pk=materia.pk baralho_pk=baralho.pk %}"><i class="fas fa-pen me-2 opacity-50"></i>Editar</a></li>
+                                        <li><hr class="dropdown-divider opacity-50"></li>
+                                        <li><a class="dropdown-item small py-2 text-danger" href="{% url 'subjects:excluir_baralho' materia_pk=materia.pk baralho_pk=baralho.pk %}"><i class="fas fa-trash-can me-2 opacity-50"></i>Excluir</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <p class="card-text text-muted small mb-4">{{ baralho.descricao|default:"Sem descrição fornecida." }}</p>
+                            
+                            <div class="mt-auto d-flex flex-column gap-2">
+                                <a href="{% url 'flashcards:sessao_revisao' baralho.id %}" class="btn btn-saas-primary shadow-sm scale-on-hover w-100 text-center">
+                                    <i class="fas fa-play-circle me-2"></i>Iniciar Revisão
+                                </a>
+                                <a href="{% url 'flashcards:novo_flashcard' baralho.id %}" class="btn btn-saas-outline w-100 text-center">
+                                    <i class="fas fa-plus me-2"></i>Novo Flashcard
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card p-5 text-center border-0 shadow-sm rounded-4 mb-5 animate-slide-up bg-white">
+            <i class="fas fa-folder-open text-muted opacity-25 display-5 mb-3"></i>
+            <h5 class="fw-bold">Nenhum baralho por aqui</h5>
+            <p class="text-muted small mb-0">Esta matéria ainda não possui baralhos. Comece criando um novo baralho acima!</p>
+        </div>
+    {% endif %}
+
+    <div class="mt-5 text-center animate-fade-in">
+        <a href="{% url 'subjects:lista_materias' %}" class="text-decoration-none text-secondary small fw-semibold">
+            <i class="fas fa-arrow-left me-2"></i> Voltar para Painel de Matérias
+        </a>
+    </div>
+</div>
+{% endblock %}

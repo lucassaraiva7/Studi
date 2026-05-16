@@ -1,173 +1,155 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Todos os Meus Flashcards - Studi SaaS</title>
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+{% extends 'base.html' %}
 
-    <style>
-        :root {
-            --saas-primary: #4f46e5;
-            --saas-primary-hover: #4338ca;
-            --saas-bg: #f8fafc;
-            --saas-card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
-            --saas-text-main: #1e293b;
-            --saas-text-muted: #64748b;
-        }
+{% block title %}Todos os Meus Flashcards - Studi SaaS{% endblock %}
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--saas-bg);
-            color: var(--saas-text-main);
-            min-height: 100vh;
-            padding: 2rem 1rem;
-        }
+{% block content %}
+<style>
+    :root {
+        --saas-primary: #4f46e5;
+        --saas-primary-hover: #4338ca;
+        --saas-card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+        --saas-text-main: #1e293b;
+        --saas-text-muted: #64748b;
+    }
 
-        .container-saas {
-            max-width: 900px;
-            margin: 0 auto;
-            animation: fadeIn 0.5s ease-out;
-        }
+    .container-saas {
+        max-width: 900px;
+        margin: 0 auto;
+        animation: fadeIn 0.5s ease-out;
+    }
 
-        .header-saas {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 2.5rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
+    .header-saas {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 2.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
 
-        h2 {
-            font-weight: 800;
-            font-size: 1.85rem;
-            letter-spacing: -0.025em;
-            margin: 0;
-        }
+    h2 {
+        font-weight: 800;
+        font-size: 1.85rem;
+        letter-spacing: -0.025em;
+        margin: 0;
+    }
 
-        /* Barra de Busca */
-        .search-area {
-            flex: 1;
-            min-width: 300px;
-            max-width: 400px;
-        }
+    /* Barra de Busca */
+    .search-area {
+        flex: 1;
+        min-width: 300px;
+        max-width: 400px;
+    }
 
-        .search-input-group {
-            background: white;
-            border-radius: 16px;
-            padding: 0.5rem 1rem;
-            display: flex;
-            align-items: center;
-            box-shadow: var(--saas-card-shadow);
-            border: 1px solid rgba(0,0,0,0.05);
-        }
+    .search-input-group {
+        background: white;
+        border-radius: 16px;
+        padding: 0.5rem 1rem;
+        display: flex;
+        align-items: center;
+        box-shadow: var(--saas-card-shadow);
+        border: 1px solid rgba(0,0,0,0.05);
+    }
 
-        .search-input-group input {
-            border: none;
-            outline: none;
-            padding: 0.5rem;
-            width: 100%;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
+    .search-input-group input {
+        border: none;
+        outline: none;
+        padding: 0.5rem;
+        width: 100%;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
 
-        .search-input-group i {
-            color: var(--saas-text-muted);
-        }
+    .search-input-group i {
+        color: var(--saas-text-muted);
+    }
 
-        .saas-card {
-            background: #ffffff;
-            border: 1px solid rgba(0,0,0,0.05) !important;
-            border-radius: 24px !important;
-            box-shadow: var(--saas-card-shadow) !important;
-            overflow: hidden;
-        }
+    .saas-card {
+        background: #ffffff;
+        border: 1px solid rgba(0,0,0,0.05) !important;
+        border-radius: 24px !important;
+        box-shadow: var(--saas-card-shadow) !important;
+        overflow: hidden;
+    }
 
-        .card-header-saas {
-            background: #ffffff;
-            padding: 1.5rem 2rem;
-            border-bottom: 1px solid #f1f5f9;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    .card-header-saas {
+        background: #ffffff;
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
-        .flashcard-item {
-            padding: 1.5rem 2rem;
-            border-bottom: 1px solid #f1f5f9;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.2s ease;
-        }
+    .flashcard-item {
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.2s ease;
+    }
 
-        .flashcard-item:hover { background-color: #f8fafc; }
+    .flashcard-item:hover { background-color: #f8fafc; }
 
-        .flashcard-content { flex: 1; padding-right: 1.5rem; }
+    .flashcard-content { flex: 1; padding-right: 1.5rem; }
 
-        .question-preview {
-            font-weight: 700;
-            font-size: 1rem;
-            color: var(--saas-text-main);
-            margin-bottom: 0.2rem;
-            display: block;
-        }
+    .question-preview {
+        font-weight: 700;
+        font-size: 1rem;
+        color: var(--saas-text-main);
+        margin-bottom: 0.2rem;
+        display: block;
+    }
 
-        /* Badge de Revisão */
-        .review-info {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-top: 0.5rem;
-        }
+    /* Badge de Revisão */
+    .review-info {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-top: 0.5rem;
+    }
 
-        .review-date {
-            padding: 0.2rem 0.6rem;
-            border-radius: 6px;
-            background: #f1f5f9;
-            color: var(--saas-text-muted);
-        }
+    .review-date {
+        padding: 0.2rem 0.6rem;
+        border-radius: 6px;
+        background: #f1f5f9;
+        color: var(--saas-text-muted);
+    }
 
-        .review-vencida {
-            background: #fef2f2;
-            color: #ef4444;
-            font-weight: 700;
-        }
+    .review-vencida {
+        background: #fef2f2;
+        color: #ef4444;
+        font-weight: 700;
+    }
 
-        .subject-badge {
-            font-size: 0.65rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            padding: 0.3rem 0.7rem;
-            border-radius: 8px;
-            color: white;
-        }
+    .subject-badge {
+        font-size: 0.65rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        padding: 0.3rem 0.7rem;
+        border-radius: 8px;
+        color: white;
+    }
 
-        .btn-action {
-            width: 36px; height: 36px;
-            display: flex; align-items: center; justify-content: center;
-            border-radius: 10px; text-decoration: none; font-size: 0.9rem;
-        }
+    .btn-action {
+        width: 36px; height: 36px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 10px; text-decoration: none; font-size: 0.9rem;
+    }
 
-        .btn-edit { background-color: #f1f5f9; color: var(--saas-text-muted); }
-        .btn-edit:hover { background-color: var(--saas-primary); color: white; transform: translateY(-2px); }
+    .btn-edit { background-color: #f1f5f9; color: var(--saas-text-muted); }
+    .btn-edit:hover { background-color: var(--saas-primary); color: white; transform: translateY(-2px); }
 
-        .btn-delete { background-color: #fef2f2; color: #ef4444; }
-        .btn-delete:hover { background-color: #ef4444; color: white; transform: translateY(-2px); }
+    .btn-delete { background-color: #fef2f2; color: #ef4444; }
+    .btn-delete:hover { background-color: #ef4444; color: white; transform: translateY(-2px); }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
-</head>
-<body>
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
 
 <div class="container-saas">
-    
     <div class="header-saas">
         <div>
             <h2>Meus Flashcards</h2>
@@ -196,7 +178,7 @@
                 <div class="flashcard-content">
                     <span class="question-preview">{{ card.question|truncatechars:70 }}</span>
                     
-                    <div class="d-flex align-items: center; gap-2 flex-wrap">
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
                         <span class="subject-badge" style="background-color: {{ card.baralho.subject.color|default:'#4f46e5' }};">
                             {{ card.baralho.subject.name }}
                         </span>
@@ -235,11 +217,8 @@
         </ul>
     </div>
 
-    <a href="{% url 'subjects:lista_materias' %}" class="btn btn-link btn-back-saas p-0 mt-4">
-        <i class="fas fa-arrow-left"></i> Voltar para Matérias
+    <a href="{% url 'subjects:lista_materias' %}" class="btn btn-link text-decoration-none p-0 mt-4">
+        <i class="fas fa-arrow-left me-1"></i> Voltar para Matérias
     </a>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+{% endblock %}
