@@ -180,7 +180,7 @@ def registrar_revisao(request, card_id, resultado):
     else: # dificil
         grade = 3
 
-    # --- LÓGICA SM-2 (Mantida conforme sua versão anterior) ---
+    # --- LÓGICA SM-2 ---
     if card.repetitions == 0:
         if grade == 5: card.interval = 4
         elif grade == 4: card.interval = 2

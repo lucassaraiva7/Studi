@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'flashcards',
     'subjects',
     'widget_tweaks',
+    'dashboard',
 ]
 
 MIDDLEWARE = [

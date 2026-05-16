@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard de Estudos — Studi{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --studi-primary: #4f46e5;
+        --studi-success: #10b981;
+        --studi-warning: #f59e0b;
+        --studi-danger: #ef4444;
+        --studi-bg-card: #ffffff;
+        --studi-text-main: #0f172a;
+        --studi-text-muted: #64748b;
+    }
+
+    .dash-header {
+        margin-bottom: 2.5rem;
+    }
+
+    /* Cards de Resumo Geral */
+    .stat-card {
+        background: var(--studi-bg-card);
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        padding: 1.5rem;
+        transition: transform 0.2s;
+    }
+    .stat-card:hover {
+        transform: translateY(-3px);
+    }
+    .icon-circle-dash {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+
+    /* Lista de Matérias */
+    .materia-status-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        position: relative;
+        overflow: hidden;
+    }
+    .materia-badge-status {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 6px;
+        height: 100%;
+    }
+
+    /* Timeline do Histórico */
+    .timeline-stream {
+        border-left: 2px solid #e2e8f0;
+        padding-left: 1.5rem;
+        position: relative;
+    }
+    .timeline-item {
+        position: relative;
+        padding-bottom: 1.5rem;
+    }
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: calc(-1.5rem - 7px);
+        top: 4px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--studi-primary);
+        border: 2px solid white;
+    }
+    .timeline-item.facil::before { background: var(--studi-success); }
+    .timeline-item.medio::before { background: var(--studi-warning); }
+    .timeline-item.dificil::before { background: var(--studi-danger); }
+</style>
+
+<div class="container py-4">
+    <div class="dash-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h1 class="fw-800 h2 mb-1 text-dark-emphasis">Painel de Estudos</h1>
+            <p class="text-muted mb-0">Acompanhe seu progresso e métricas de retenção.</p>
+        </div>
+        <div>
+            <a href="{% url 'subjects:lista_materias' %}" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
+                <i class="fas fa-book me-2"></i> Gerenciar Matérias
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-12 col-sm-6 col-lg-4">
+            <div class="stat-card shadow-sm d-flex align-items-center gap-3">
+                <div class="icon-circle-dash bg-danger-subtle text-danger">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div>
+                    <span class="text-muted small d-block fw-semibold text-uppercase">Pendentes Hoje</span>
+                    <h3 class="fw-extrabold mb-0 {% if cards_pendentes_hoje > 0 %}text-danger{% else %}text-success{% endif %}">
+                        {{ cards_pendentes_hoje }}
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-4">
+            <div class="stat-card shadow-sm d-flex align-items-center gap-3">
+                <div class="icon-circle-dash bg-primary-subtle text-primary">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <div>
+                    <span class="text-muted small d-block fw-semibold text-uppercase">Cards Totais</span>
+                    <h3 class="fw-extrabold mb-0 text-dark-emphasis">{{ total_cards }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-4">
+            <div class="stat-card shadow-sm d-flex align-items-center gap-3">
+                {% if cards_pendentes_hoje == 0 %}
+                    <div class="icon-circle-dash bg-success-subtle text-success">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div>
+                        <span class="text-muted small d-block fw-semibold text-uppercase">Status do Dia</span>
+                        <h5 class="fw-bold mb-0 text-success">Tudo em dia! 🎉</h5>
+                    </div>
+                {% else %}
+                    <div class="icon-circle-dash bg-warning-subtle text-warning">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div>
+                        <span class="text-muted small d-block fw-semibold text-uppercase">Status do Dia</span>
+                        <h5 class="fw-bold mb-0 text-warning">Hora de revisar! 📚</h5>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-12 col-lg-8">
+            <h3 class="fw-bold h4 mb-4 text-dark-emphasis">Progresso de Aprendizagem</h3>
+            
+            {% if materias_stats %}
+                {% for materia in materias_stats %}
+                <div class="materia-status-card shadow-sm">
+                    <div class="materia-badge-status" style="background-color: {{ materia.color }};"></div>
+                    
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+                        <div>
+                            <h5 class="fw-bold mb-1 text-dark">{{ materia.name }}</h5>
+                            <span class="text-muted small">
+                                <i class="fas fa-folder me-1 opacity-50"></i>{{ materia.total_baralhos }} baralho{{ materia.total_baralhos|pluralize }}
+                            </span>
+                        </div>
+                        
+                        <div class="text-end">
+                            {% if forloop.first and materia.total_cards > 0 and materia.media_facilidade < 2.2 %}
+                                <span class="badge bg-danger-subtle text-danger rounded-pill px-2 py-1 small fw-bold mb-1 d-inline-block">
+                                    <i class="fas fa-exclamation-triangle me-1"></i> Maior Dificuldade
+                                </span>
+                            {% endif %}
+                            <span class="d-block text-muted small">
+                                EF Médio: <strong class="text-dark">{{ materia.media_facilidade|default:"2.5"|stringformat:".2f" }}</strong>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="row g-2 pt-2 border-top">
+                        <div class="col-6 col-sm-4">
+                            <span class="text-muted extra-small d-block text-uppercase fw-semibold">Cards Cadastrados</span>
+                            <span class="fw-bold text-dark">{{ materia.total_cards }}</span>
+                        </div>
+                        <div class="col-6 col-sm-4">
+                            <span class="text-muted extra-small d-block text-uppercase fw-semibold">Pendentes Hoje</span>
+                            <span class="fw-bold {% if materia.pendentes_hoje > 0 %}text-danger{% else %}text-success{% endif %}">
+                                {{ materia.pendentes_hoje }}
+                            </span>
+                        </div>
+                        <div class="col-12 col-sm-4 text-sm-end mt-2 mt-sm-0">
+                            <a href="{% url 'subjects:materia_detalhes' materia.pk %}" class="btn btn-sm btn-light border rounded-pill px-3 fw-bold">
+                                Acessar Módulo <i class="fas fa-chevron-right ms-1 fa-xs"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="card p-5 text-center border-0 shadow-sm rounded-4">
+                    <p class="text-muted mb-0">Você ainda não possui matérias para gerar estatísticas.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="col-12 col-lg-4">
+            <h3 class="fw-bold h4 mb-4 text-dark-emphasis">Atividade Recente</h3>
+            
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                {% if historico_recente %}
+                    <div class="timeline-stream">
+                        {% for log in historico_recente %}
+                        <div class="timeline-item {{ log.grade }}">
+                            <span class="text-muted extra-small d-block">{{ log.review_date|date:"d/m/Y - H:i" }}</span>
+                            <strong class="text-dark d-block small mb-1">{{ log.card.question|truncatechars:35 }}</strong>
+                            <span class="badge rounded-pill px-2 py-0 extra-small 
+                                {% if log.grade == 'facil' %}bg-success-subtle text-success
+                                {% elif log.grade == 'medio' %}bg-warning-subtle text-warning
+                                {% else %}bg-danger-subtle text-danger{% endif %}">
+                                Resposta: {{ log.grade|upper }}
+                            </span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-history text-muted opacity-25 display-6 mb-2"></i>
+                        <p class="text-muted small mb-0">Nenhuma revisão registrada recentemente.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
