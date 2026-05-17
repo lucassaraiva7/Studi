@@ -2,50 +2,219 @@
 {% load widget_tweaks %}
 
 {% block title %}
-    {% if card %}
-        Editar Flashcard
-    {% else %}
-        Novo Flashcard
-    {% endif %}
+    {% if card %}Editar Flashcard{% else %}Novo Flashcard{% endif %} — Studi SaaS
 {% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'subjects:lista_materias' %}">Matérias</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'subjects:materia_detalhes' pk=baralho.subject.pk %}">{{ baralho.subject.name }}</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'subjects:baralho_detalhes' materia_pk=baralho.subject.pk baralho_pk=baralho.pk %}">{{ baralho.nome }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">
-                {% if card %}Editar Flashcard{% else %}Novo Flashcard{% endif %}
-            </li>
-        </ol>
-    </nav>
+<style>
+    :root {
+        --saas-primary: #2563eb;
+        --saas-primary-hover: #1d4ed8;
+        --saas-card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+        --saas-text-main: #1e293b;
+        --saas-text-muted: #64748b;
+    }
 
-    <h2>{% if card %}Editar Flashcard{% else %}Criar Novo Flashcard{% endif %} para o baralho "{{ baralho.nome }}"</h2>
-    <hr>
+    .form-wrapper-centered {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: calc(100vh - 150px);
+    }
 
-    <form method="post">
-        {% csrf_token %}
+    .form-container {
+        width: 100%;
+        max-width: 580px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
 
-        {% for field in form %}
-            {% if field.name != 'baralho' %}
-                <div class="mb-3">
-                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                    {% render_field field class="form-control" %}
-                    {% if field.errors %}
-                        <div class="alert alert-danger mt-1">
-                            {{ field.errors.as_text }}
-                        </div>
-                    {% endif %}
+    .saas-card {
+        background: #ffffff;
+        border: 1px solid rgba(0,0,0,0.05) !important;
+        border-radius: 24px !important;
+        box-shadow: var(--saas-card-shadow) !important;
+        overflow: hidden;
+        animation: slideUp 0.6s ease-out;
+    }
+
+    .card-header-saas {
+        background: linear-gradient(135deg, var(--saas-primary), var(--saas-primary-hover));
+        padding: 2.5rem 2rem;
+        text-align: center;
+        color: white;
+        border: none;
+    }
+
+    .icon-circle {
+        width: 64px;
+        height: 64px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.5rem;
+        backdrop-filter: blur(4px);
+    }
+
+    .form-body {
+        padding: 2.5rem 2rem;
+    }
+
+    label {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--saas-text-main);
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    input, select, textarea {
+        display: block;
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: var(--saas-text-main);
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        transition: all 0.2s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+        background-color: #fff;
+        border-color: var(--saas-primary);
+        outline: 0;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    }
+
+    .btn-saas-primary {
+        background-color: var(--saas-primary);
+        color: white !important;
+        border: none;
+        padding: 1rem;
+        border-radius: 12px;
+        font-weight: 700;
+        width: 100%;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+        margin-top: 1rem;
+    }
+
+    .btn-saas-primary:hover {
+        background-color: var(--saas-primary-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-saas-link {
+        color: var(--saas-text-muted);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        margin-top: 1.5rem;
+        transition: color 0.2s;
+    }
+
+    .btn-saas-link:hover {
+        color: var(--saas-primary);
+    }
+
+    .extra-small {
+        font-size: 0.75rem;
+    }
+
+    .breadcrumb-saas {
+        margin-bottom: 2rem;
+        font-size: 0.85rem;
+    }
+    .breadcrumb-saas a {
+        color: var(--saas-text-muted);
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+    .breadcrumb-saas a:hover { color: var(--saas-primary); }
+
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<div class="form-wrapper-centered">
+    <div class="form-container">
+        
+        <nav class="breadcrumb-saas text-center">
+            <a href="{% url 'subjects:lista_materias' %}">Matérias</a>
+            <span class="mx-2 text-muted">/</span>
+            <a href="{% url 'subjects:materia_detalhes' pk=baralho.subject.pk %}">{{ baralho.subject.name }}</a>
+            <span class="mx-2 text-muted">/</span>
+            <a href="{% url 'subjects:baralho_detalhes' materia_pk=baralho.subject.pk baralho_pk=baralho.pk %}">{{ baralho.nome }}</a>
+            <span class="mx-2 text-muted">/</span>
+            <span class="text-primary fw-bold">{% if card %}Editar{% else %}Novo Card{% endif %}</span>
+        </nav>
+
+        <div class="card saas-card">
+            <div class="card-header-saas">
+                <div class="icon-circle">
+                    {% if card %}<i class="fas fa-pen"></i>{% else %}<i class="fas fa-plus-circle"></i>{% endif %}
                 </div>
-            {% endif %}
-        {% endfor %}
+                <h2 class="h4 fw-bold mb-1">{% if card %}Editar Flashcard{% else %}Criar Novo Flashcard{% endif %}</h2>
+                <p class="mb-0 opacity-75 small">Vinculado ao baralho: <strong>{{ baralho.nome }}</strong></p>
+            </div>
 
-        <div class="d-flex justify-content-end">
-            <a href="{% url 'subjects:baralho_detalhes' materia_pk=baralho.subject.pk baralho_pk=baralho.pk %}" class="btn btn-secondary me-2">Cancelar</a>
-            <button type="submit" class="btn btn-primary">Salvar</button>
+            <div class="form-body">
+                <form method="POST" novalidate>
+                    {% csrf_token %}
+
+                    {% for field in form %}
+                        {% if field.name != 'baralho' %}
+                            <div class="mb-4">
+                                <label for="{{ field.id_for_label }}">
+                                    {% if field.name == 'question' %}
+                                        Pergunta
+                                    {% elif field.name == 'answer' %}
+                                        Resposta
+                                    {% else %}
+                                        {{ field.label }}
+                                    {% endif %}
+                                </label>
+                                
+                                <div class="position-relative">
+                                    {% render_field field class="form-control" %}
+                                </div>
+
+                                {% if field.errors %}
+                                    <div class="text-danger extra-small mt-2 fw-bold">
+                                        <i class="fas fa-info-circle me-1"></i> {{ field.errors.as_text }}
+                                    </div>
+                                {% endif %}
+                                
+                                {% if field.help_text %}
+                                    <div class="text-muted extra-small mt-2">{{ field.help_text }}</div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+
+                    <button type="submit" class="btn btn-saas-primary">
+                        <i class="fas fa-save me-2"></i> Salvar Flashcard
+                    </button>
+
+                    <a href="{% url 'subjects:baralho_detalhes' materia_pk=baralho.subject.pk baralho_pk=baralho.pk %}" class="btn btn-saas-link">
+                        <i class="fas fa-times me-2"></i> Cancelar e Voltar
+                    </a>
+                </form>
+            </div>
         </div>
-    </form>
+    </div>
 </div>
 {% endblock %}

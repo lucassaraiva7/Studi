@@ -1,55 +1,259 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
 
-{% block title %}Detalhes do Baralho - {{ baralho.nome }}{% endblock %}
+{% block title %}Detalhes do Baralho — {{ baralho.nome }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'subjects:lista_materias' %}">Matérias</a></li>
+<style>
+    :root {
+        --saas-primary: #2563eb;
+        --saas-primary-hover: #1d4ed8;
+        --saas-success: #10b981;
+        --saas-success-hover: #059669;
+        --saas-card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+        --saas-text-main: #1e293b;
+        --saas-text-muted: #64748b;
+    }
+
+    .container-saas {
+        max-width: 1000px;
+        margin: 0 auto;
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    /* Estilo Glassmorphism para o Header Box */
+    .baralho-hero-card {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 24px;
+        padding: 2.5rem;
+        margin-bottom: 2.5rem;
+        box-shadow: var(--saas-card-shadow);
+    }
+
+    /* Botões SaaS */
+    .btn-saas {
+        padding: 0.65rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+    .btn-saas-primary {
+        background-color: var(--saas-primary);
+        color: white !important;
+        border: none;
+    }
+    .btn-saas-primary:hover {
+        background-color: var(--saas-primary-hover);
+        transform: translateY(-2px);
+    }
+    .btn-saas-success {
+        background-color: var(--saas-success);
+        color: white !important;
+        border: none;
+    }
+    .btn-saas-success:hover {
+        background-color: var(--saas-success-hover);
+        transform: translateY(-2px);
+    }
+    .btn-saas-outline {
+        background-color: white;
+        color: var(--saas-text-main) !important;
+        border: 1.5px solid #e2e8f0;
+    }
+    .btn-saas-outline:hover {
+        background-color: #f8fafc;
+        border-color: #cbd5e1;
+        transform: translateY(-2px);
+    }
+
+    /* Lista de Flashcards */
+    .saas-list-card {
+        background: #ffffff;
+        border: 1px solid rgba(0,0,0,0.04);
+        border-radius: 24px;
+        box-shadow: var(--saas-card-shadow);
+        overflow: hidden;
+    }
+    .list-header-saas {
+        background: #ffffff;
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .card-item-saas {
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.2s ease;
+    }
+    .card-item-saas:last-child {
+        border-bottom: none;
+    }
+    .card-item-saas:hover {
+        background-color: #f8fafc;
+    }
+
+    .card-info-pane {
+        flex: 1;
+        padding-right: 2rem;
+    }
+    .card-question-text {
+        font-weight: 700;
+        font-size: 1.05rem;
+        color: var(--saas-text-main);
+        margin-bottom: 0.3rem;
+        display: block;
+    }
+    .card-answer-preview {
+        color: var(--saas-text-muted);
+        font-size: 0.95rem;
+        margin-bottom: 0;
+    }
+
+    .card-meta-pane {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .review-badge-saas {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--saas-text-muted);
+        background: #f1f5f9;
+        padding: 0.4rem 0.8rem;
+        border-radius: 8px;
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    /* Ações Rápidas dos Cards */
+    .btn-action-saas {
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+    }
+    .btn-action-edit { background-color: #f1f5f9; color: var(--saas-text-muted); }
+    .btn-action-edit:hover { background-color: var(--saas-primary); color: white; transform: translateY(-2px); }
+    .btn-action-delete { background-color: #fef2f2; color: #ef4444; }
+    .btn-action-delete:hover { background-color: #ef4444; color: white; transform: translateY(-2px); }
+
+    /* Empty State Contextualizado */
+    .empty-state-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border: 1px solid rgba(0,0,0,0.04);
+        border-radius: 24px;
+        box-shadow: var(--saas-card-shadow);
+    }
+
+    .breadcrumb-saas a {
+        color: var(--saas-text-muted);
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+    .breadcrumb-saas a:hover { color: var(--saas-primary); }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+
+<div class="container-saas py-4">
+    
+    <nav aria-label="breadcrumb" class="mb-4 breadcrumb-saas">
+        <ol class="breadcrumb bg-transparent p-0 m-0">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
             <li class="breadcrumb-item"><a href="{% url 'subjects:materia_detalhes' pk=baralho.subject.pk %}">{{ baralho.subject.name }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ baralho.nome }}</li>
+            <li class="breadcrumb-item active fw-semibold text-primary" aria-current="page">{{ baralho.nome }}</li>
         </ol>
     </nav>
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1><i class="fas fa-layer-group"></i> Baralho: {{ baralho.nome }}</h1>
-        <div>
-            <a href="{% url 'flashcards:sessao_revisao' baralho.id %}" class="btn btn-primary"><i class="fas fa-book-open"></i> Revisar Baralho</a>
-            <a href="{% url 'flashcards:novo_flashcard' baralho.id %}" class="btn btn-success"><i class="fas fa-plus"></i> Novo Flashcard</a>
-            <a href="{% url 'subjects:duplicar_baralho' materia_pk=baralho.subject.pk baralho_pk=baralho.pk %}" class="btn btn-outline-secondary ms-2"><i class="fas fa-clone"></i> Duplicar</a>
+    <div class="baralho-hero-card">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
+            <div>
+                <span class="text-uppercase tracking-wider extra-small fw-bold text-primary mb-1 d-block">Baralho Disponível</span>
+                <h1 class="h2 fw-800 text-dark-emphasis mb-2"><i class="fas fa-layer-group text-primary me-2"></i>{{ baralho.nome }}</h1>
+                <p class="text-secondary mb-0 opacity-80">{{ baralho.descricao|default:"Sem descrição configurada para este baralho." }}</p>
+            </div>
+            
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{% url 'flashcards:sessao_revisao' baralho.id %}" class="btn-saas btn-saas-primary shadow-sm">
+                    <i class="fas fa-book-open"></i> Revisar Baralho
+                </a>
+                <a href="{% url 'flashcards:novo_flashcard' baralho.id %}" class="btn-saas btn-saas-success shadow-sm">
+                    <i class="fas fa-plus"></i> Novo Flashcard
+                </a>
+                <a href="{% url 'subjects:duplicar_baralho' materia_pk=baralho.subject.pk baralho_pk=baralho.pk %}" class="btn-saas btn-saas-outline">
+                    <i class="fas fa-clone"></i> Duplicar
+                </a>
+            </div>
         </div>
     </div>
 
-    <p>{{ baralho.descricao }}</p>
-
-    <hr>
-
-    <h2 class="mb-3">Flashcards</h2>
-
     {% if flashcards %}
-        <div class="list-group">
-            {% for card in flashcards %}
-                <div class="list-group-item list-group-item-action flex-column align-items-start">
-                    <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">{{ card.question|truncatewords:15 }}</h5>
-                        <small>Próxima revisão: {{ card.next_review|date:"d/m/Y" }}</small>
+        <div class="saas-list-card">
+            <div class="list-header-saas d-flex justify-content-between align-items-center">
+                <h3 class="fw-bold h5 m-0 text-dark-emphasis">Cards Vinculados</h3>
+                <span class="badge bg-light text-secondary border px-3 py-2 rounded-pill fw-bold small">{{ flashcards|length }} total</span>
+            </div>
+            
+            <div class="list-body-saas">
+                {% for card in flashcards %}
+                    <div class="card-item-saas">
+                        <div class="card-info-pane">
+                            <span class="card-question-text">{{ card.question|truncatechars:65 }}</span>
+                            <p class="card-answer-preview">{{ card.answer|truncatechars:85 }}</p>
+                        </div>
+                        
+                        <div class="card-meta-pane">
+                            <div class="review-badge-saas">
+                                <i class="far fa-calendar-alt opacity-70"></i>
+                                <span>Revisão: <strong>{{ card.next_review|date:"d/m/Y" }}</strong></span>
+                            </div>
+                            
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'flashcards:editar_flashcard' card.id %}" class="btn-action-saas btn-action-edit" title="Editar Card">
+                                    <i class="fas fa-pen fa-xs"></i>
+                                </a>
+                                <a href="{% url 'flashcards:excluir_flashcard' card.id %}" class="btn-action-saas btn-action-delete" title="Excluir Card">
+                                    <i class="fas fa-trash-alt fa-xs"></i>
+                                </a>
+                            </div>
+                        </div>
                     </div>
-                    <p class="mb-1">{{ card.answer|truncatewords:20 }}</p>
-                    <div class="mt-2">
-                        <a href="{% url 'flashcards:editar_flashcard' card.id %}" class="btn btn-sm btn-outline-info"><i class="fas fa-edit"></i> Editar</a>
-                        <a href="{% url 'flashcards:excluir_flashcard' card.id %}" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i> Excluir</a>
-                    </div>
-                </div>
-            {% endfor %}
+                {% endfor %}
+            </div>
         </div>
     {% else %}
-        <div class="alert alert-info" role="alert">
-            <h4 class="alert-heading">Nenhum flashcard!</h4>
-            <p>Este baralho ainda não tem flashcards. Que tal criar o primeiro?</p>
-            <hr>
-            <a href="{% url 'flashcards:novo_flashcard' baralho.id %}" class="btn btn-success"><i class="fas fa-plus"></i> Criar Novo Flashcard</a>
+        <div class="empty-state-box">
+            <i class="fas fa-layer-group text-muted opacity-25 display-4 mb-3"></i>
+            <h5 class="fw-bold text-dark mb-2">Esse baralho ainda não tem cards, gostaria de criar um?</h5>
+            <p class="text-muted small mb-4 max-width-1100" style="max-width: 400px;">Adicione cartões com perguntas e respostas estruturadas para calibrar o seu algoritmo de repetição espaçada.</p>
+            <a href="{% url 'flashcards:novo_flashcard' baralho.id %}" class="btn-saas btn-saas-success shadow-sm">
+                <i class="fas fa-plus"></i> Criar Primeiro Flashcard
+            </a>
         </div>
     {% endif %}
 </div>

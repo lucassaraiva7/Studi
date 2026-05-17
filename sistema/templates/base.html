@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Studi App{% endblock %}</title>
+    <title>{% block title %}Studi{% endblock %}</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -11,16 +11,13 @@
 
     <style>
         :root {
-            --sidebar-bg: #0f172a; /* Azul escuro/Slate premium para a barra */
-            --saas-blue: #2563eb;   /* Azul SaaS elétrico para destaques */
+            --sidebar-bg: #0f172a; 
+            --saas-blue: #2563eb;   
             --saas-blue-light: #eff6ff;
             --text-muted: #94a3b8;
-            
-            /* Larguras dinâmicas da barra lateral */
             --sidebar-width: 70px; 
         }
 
-        /* Quando a barra estiver expandida, a largura muda */
         body.sidebar-expanded {
             --sidebar-width: 260px;
         }
@@ -51,7 +48,6 @@
             overflow: hidden;
         }
 
-        /* Topo da Sidebar (Menu Hambúrguer + Logo) */
         .sidebar-header {
             height: 70px;
             display: flex;
@@ -92,7 +88,6 @@
             transform: translateX(0);
         }
 
-        /* Links de Navegação */
         .sidebar-nav {
             list-style: none;
             padding: 1rem 0.75rem;
@@ -127,18 +122,15 @@
             transition: opacity 0.2s ease;
         }
 
-        /* Exibe o texto apenas quando expandido */
         body.sidebar-expanded .nav-item-text {
             opacity: 1;
         }
 
-        /* Estados de Hover e Ativo */
         .nav-item-link:hover {
             color: white;
             background: rgba(255, 255, 255, 0.05);
         }
 
-        /* Classe ativa dinâmica do Django (opcional se quiser usar) */
         .nav-item-link.active {
             background: var(--saas-blue);
             color: white;
@@ -153,7 +145,6 @@
             flex-direction: column;
         }
 
-        /* Topbar de suporte interna */
         .saas-topbar {
             height: 70px;
             background: white;
@@ -176,7 +167,7 @@
             <button class="toggle-menu-btn" id="menuToggle" title="Expandir menu">
                 <i class="fas fa-bars"></i>
             </button>
-            <span class="sidebar-logo-text">Studi<span class="text-primary">.app</span></span>
+            <span class="sidebar-logo-text">Studi</span>
         </div>
 
         <ul class="sidebar-nav">
@@ -202,12 +193,9 @@
     </div>
 
     <div class="main-wrapper">
-        <div class="saas-topbar justify-content-between">
-            <span class="fw-semibold text-secondary small">Sprint 3 — Workspace Ativo</span>
-            <div class="dropdown">
-                <span class="badge bg-light text-dark border p-2 rounded-pill fw-bold">
-                    <i class="fas fa-user-circle me-1 text-primary"></i> {{ request.user.username }}
-                </span>
+        <div class="saas-topbar justify-content-end">
+            <div class="text-secondary small fw-medium">
+                {% now "l, d \d\e F" %}
             </div>
         </div>
 
@@ -223,14 +211,12 @@
         const menuToggle = document.getElementById('menuToggle');
         const body = document.body;
 
-        // Recupera a preferência do usuário do armazenamento local (opcional/mimo)
         if (localStorage.getItem('sidebar-expanded') === 'true') {
             body.classList.add('sidebar-expanded');
         }
 
         menuToggle.addEventListener('click', () => {
             body.classList.toggle('sidebar-expanded');
-            // Salva o estado para não resetar ao mudar de página
             localStorage.setItem('sidebar-expanded', body.classList.contains('sidebar-expanded'));
         });
     </script>

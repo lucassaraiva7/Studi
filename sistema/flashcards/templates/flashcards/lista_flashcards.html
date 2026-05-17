@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
-{% block title %}Todos os Meus Flashcards - Studi SaaS{% endblock %}
+{% block title %}Todos os Meus Flashcards — Studi SaaS{% endblock %}
 
 {% block content %}
 <style>
     :root {
-        --saas-primary: #4f46e5;
-        --saas-primary-hover: #4338ca;
+        --saas-primary: #2563eb; /* Atualizado para o Azul Elétrico do base.html */
+        --saas-primary-hover: #1d4ed8;
         --saas-card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
         --saas-text-main: #1e293b;
         --saas-text-muted: #64748b;
@@ -138,6 +138,7 @@
         width: 36px; height: 36px;
         display: flex; align-items: center; justify-content: center;
         border-radius: 10px; text-decoration: none; font-size: 0.9rem;
+        transition: all 0.2s ease;
     }
 
     .btn-edit { background-color: #f1f5f9; color: var(--saas-text-muted); }
@@ -149,7 +150,7 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 
-<div class="container-saas">
+<div class="container-saas py-4">
     <div class="header-saas">
         <div>
             <h2>Meus Flashcards</h2>
@@ -179,7 +180,7 @@
                     <span class="question-preview">{{ card.question|truncatechars:70 }}</span>
                     
                     <div class="d-flex align-items-center gap-2 flex-wrap">
-                        <span class="subject-badge" style="background-color: {{ card.baralho.subject.color|default:'#4f46e5' }};">
+                        <span class="subject-badge" style="background-color: {{ card.baralho.subject.color|default:'#2563eb' }};">
                             {{ card.baralho.subject.name }}
                         </span>
 
@@ -217,7 +218,7 @@
         </ul>
     </div>
 
-    <a href="{% url 'subjects:lista_materias' %}" class="btn btn-link text-decoration-none p-0 mt-4">
+    <a href="{% url 'subjects:lista_materias' %}" class="btn btn-link text-decoration-none p-0 mt-4 fw-semibold text-secondary small">
         <i class="fas fa-arrow-left me-1"></i> Voltar para Matérias
     </a>
 </div>

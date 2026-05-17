@@ -1,22 +1,229 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ titulo }}{% endblock %}
+{% block title %}{{ titulo }} — Studi SaaS{% endblock %}
 
 {% block content %}
-<div class="card shadow-sm">
-    <div class="card-header">
-        <h2 class="mb-0">{{ titulo }}</h2>
-        <p class="lead mb-0">Para a matéria: <strong>{{ materia.name }}</strong></p>
-    </div>
-    <div class="card-body">
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <div class="d-flex justify-content-end">
-                <a href="{% url 'subjects:materia_detalhes' materia.pk %}" class="btn btn-secondary me-2">Cancelar</a>
-                <button type="submit" class="btn btn-primary">Salvar</button>
+<style>
+    :root {
+        --saas-primary: #4f46e5;
+        --saas-primary-hover: #4338ca;
+        --saas-card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+        --saas-text-main: #1e293b;
+        --saas-text-muted: #64748b;
+    }
+
+    .form-wrapper-centered {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: calc(100vh - 150px);
+    }
+
+    .form-container {
+        width: 100%;
+        max-width: 550px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    .saas-card {
+        background: #ffffff;
+        border: 1px solid rgba(0,0,0,0.05) !important;
+        border-radius: 24px !important;
+        box-shadow: var(--saas-card-shadow) !important;
+        overflow: hidden;
+        animation: slideUp 0.6s ease-out;
+    }
+
+    .card-header-saas {
+        background: linear-gradient(135deg, var(--saas-primary), var(--saas-primary-hover));
+        padding: 2.5rem 2rem;
+        text-align: center;
+        color: white;
+        border: none;
+    }
+
+    .icon-circle {
+        width: 64px;
+        height: 64px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.5rem;
+        backdrop-filter: blur(4px);
+    }
+
+    .form-body {
+        padding: 2.5rem 2rem;
+    }
+
+    label {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--saas-text-main);
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    input, select, textarea {
+        display: block;
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: var(--saas-text-main);
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        transition: all 0.2s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+        background-color: #fff;
+        border-color: var(--saas-primary);
+        outline: 0;
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+    }
+
+    .btn-saas-primary {
+        background-color: var(--saas-primary);
+        color: white !important;
+        border: none;
+        padding: 1rem;
+        border-radius: 12px;
+        font-weight: 700;
+        width: 100%;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+        margin-top: 1rem;
+    }
+
+    .btn-saas-primary:hover {
+        background-color: var(--saas-primary-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+    }
+
+    .btn-saas-link {
+        color: var(--saas-text-muted);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        margin-top: 1.5rem;
+        transition: color 0.2s;
+    }
+
+    .btn-saas-link:hover {
+        color: var(--saas-primary);
+    }
+
+    .alert-saas {
+        border-radius: 12px;
+        padding: 1rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        border: none;
+        margin-bottom: 1.5rem;
+    }
+
+    .extra-small {
+        font-size: 0.75rem;
+    }
+
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .breadcrumb-saas {
+        margin-bottom: 2rem;
+        font-size: 0.85rem;
+    }
+    .breadcrumb-saas a {
+        color: var(--saas-text-muted);
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+    .breadcrumb-saas a:hover { color: var(--saas-primary); }
+</style>
+
+<div class="form-wrapper-centered">
+    <div class="form-container">
+        
+        <nav class="breadcrumb-saas text-center">
+            <a href="{% url 'subjects:lista_materias' %}">Matérias</a>
+            <span class="mx-2 text-muted">/</span>
+            <a href="{% url 'subjects:materia_detalhes' materia.pk %}">{{ materia.name }}</a>
+            <span class="mx-2 text-muted">/</span>
+            <span class="text-primary fw-bold">{{ titulo }}</span>
+        </nav>
+
+        <div class="card saas-card">
+            <div class="card-header-saas">
+                <div class="icon-circle">
+                    <i class="fas fa-folder-plus"></i>
+                </div>
+                <h2 class="h4 fw-bold mb-1">{{ titulo }}</h2>
+                <p class="mb-0 opacity-75 small">Gerencie os baralhos de <strong>{{ materia.name }}</strong></p>
             </div>
-        </form>
+
+            <div class="form-body">
+                <form method="POST" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger alert-saas shadow-sm">
+                            {% for error in form.non_field_errors %}
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-exclamation-circle me-2"></i>
+                                    <span>{{ error }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    {% for field in form %}
+                        <div class="mb-4">
+                            <label for="{{ field.id_for_label }}">
+                                {{ field.label }}
+                            </label>
+                            
+                            <div class="position-relative">
+                                {{ field }}
+                            </div>
+
+                            {% if field.errors %}
+                                <div class="text-danger extra-small mt-2 fw-bold">
+                                    {% for error in field.errors %}
+                                        <i class="fas fa-info-circle me-1"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            
+                            {% if field.help_text %}
+                                <div class="text-muted extra-small mt-2">{{ field.help_text }}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+
+                    <button type="submit" class="btn btn-saas-primary">
+                        <i class="fas fa-save me-2"></i> Salvar Baralho
+                    </button>
+
+                    <a href="{% url 'subjects:materia_detalhes' materia.pk %}" class="btn btn-saas-link">
+                        <i class="fas fa-times me-2"></i> Cancelar e Voltar
+                    </a>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

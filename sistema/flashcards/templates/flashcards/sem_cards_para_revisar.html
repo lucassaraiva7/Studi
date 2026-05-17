@@ -1,32 +1,121 @@
 {% extends 'base.html' %}
 
-{% block title %}Tudo em Dia - Studi{% endblock %}
+{% block title %}Tudo em Dia — Studi SaaS{% endblock %}
 
 {% block content %}
-<div class="container text-center" style="max-width: 500px; margin-top: 5rem;">
-    <div class="mb-4">
-        <div class="display-1 text-success opacity-25 mb-3">
+<style>
+    :root {
+        --saas-primary: #2563eb;
+        --saas-primary-hover: #1d4ed8;
+        --saas-card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+        --saas-text-main: #1e293b;
+        --saas-text-muted: #64748b;
+    }
+
+    /* Centraliza o estado vazio na área de conteúdo */
+    .empty-state-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: calc(100vh - 180px);
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    .empty-state-card {
+        background: #ffffff;
+        border: 1px solid rgba(0,0,0,0.04);
+        border-radius: 28px;
+        padding: 4rem 2rem;
+        max-width: 520px;
+        width: 100%;
+        text-align: center;
+        box-shadow: var(--saas-card-shadow);
+    }
+
+    /* Embalagem premium para o ícone de descanso (café) */
+    .icon-relax-wrapper {
+        width: 88px;
+        height: 88px;
+        background-color: #eff6ff;
+        color: var(--saas-primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 2rem;
+        font-size: 2.5rem;
+        box-shadow: 0 0 0 8px #eff6ff;
+    }
+
+    /* Botões Padrão SaaS */
+    .btn-saas {
+        padding: 0.85rem 1.75rem;
+        border-radius: 14px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        width: 100%;
+    }
+    .btn-saas-primary {
+        background-color: var(--saas-primary);
+        color: white !important;
+        border: none;
+        box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+    }
+    .btn-saas-primary:hover {
+        background-color: var(--saas-primary-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+    }
+    .btn-saas-outline {
+        background-color: white;
+        color: var(--saas-text-main) !important;
+        border: 1.5px solid #e2e8f0;
+    }
+    .btn-saas-outline:hover {
+        background-color: #f8fafc;
+        border-color: #cbd5e1;
+        transform: translateY(-2px);
+    }
+
+    .extra-small {
+        font-size: 0.75rem;
+    }
+
+    @keyframes fadeIn { 
+        from { opacity: 0; transform: translateY(10px); } 
+        to { opacity: 1; transform: translateY(0); } 
+    }
+</style>
+
+<div class="empty-state-wrapper">
+    <div class="empty-state-card">
+        <div class="icon-relax-wrapper">
             <i class="fas fa-mug-hot"></i>
         </div>
-        <h2 class="fw-800">Tudo em dia por aqui!</h2>
-        <p class="text-muted">
-            Você não tem flashcards pendentes para revisão no momento. 
-            Que tal descansar um pouco ou criar novos cards?
+        
+        <h2 class="fw-800 text-dark-emphasis mb-2">Tudo em dia por aqui!</h2>
+        <p class="text-muted small mb-5 mx-auto" style="max-width: 380px;">
+            Você não tem flashcards pendentes para revisão no momento. Que tal aproveitar para descansar um pouco ou estruturar novos cards?
         </p>
+        
+        <div class="d-flex flex-column gap-3">
+            <a href="{% url 'subjects:lista_materias' %}" class="btn-saas btn-saas-primary">
+                <i class="fas fa-arrow-left"></i> Ir para Matérias
+            </a>
+            <a href="{% url 'flashcards:lista_flashcards' %}" class="btn-saas btn-saas-outline">
+                <i class="fas fa-layer-group"></i> Ver Meus Cards
+            </a>
+        </div>
+        
+        <div class="text-center mt-5 text-muted extra-small opacity-75">
+            <i class="fas fa-info-circle me-1"></i> O algoritmo de repetição espaçada agendará novos cards automaticamente.
+        </div>
     </div>
-
-    <div class="d-grid gap-2 mt-5">
-        <a href="{% url 'subjects:lista_materias' %}" class="btn btn-primary btn-lg rounded-pill fw-bold py-3 shadow-sm">
-            <i class="fas fa-arrow-left me-2"></i> Ir para Matérias
-        </a>
-        <a href="{% url 'flashcards:lista_flashcards' %}" class="btn btn-light btn-lg rounded-pill fw-bold py-3">
-            <i class="fas fa-plus me-2"></i> Ver Meus Cards
-        </a>
-    </div>
-    
-    <p class="mt-5 text-muted small">
-        <i class="fas fa-info-circle me-1"></i> 
-        O algoritmo de repetição espaçada agendará novos cards automaticamente.
-    </p>
 </div>
 {% endblock %}

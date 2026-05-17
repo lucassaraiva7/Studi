@@ -1,58 +1,227 @@
 {% extends 'base.html' %}
 
-{% block title %}Confirmar Exclusão{% endblock %}
+{% block title %}Excluir Flashcard — Studi SaaS{% endblock %}
 
 {% block content %}
-<div class="delete-container">
-    <div class="card saas-card">
-        <div class="danger-accent"></div>
-        <div class="card-body-saas">
-            <div class="icon-wrapper">
-                <i class="fas fa-trash-can"></i>
-            </div>
-            
-            <h2 class="h4 fw-bold mb-2">Excluir Flashcard</h2>
-            <p class="text-muted small mb-4">Você tem certeza que deseja apagar este card? Esta ação é permanente e não pode ser desfeita.</p>
+<style>
+    :root {
+        --saas-danger: #ef4444;
+        --saas-danger-hover: #dc2626;
+        --saas-card-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        --saas-text-main: #1e293b;
+        --saas-text-muted: #64748b;
+    }
 
-            <div class="mb-4">
-                <span class="badge-danger-saas">Card Selecionado</span>
-                <div class="item-preview">
-                    <span class="label">Pergunta</span>
-                    <div class="content">
-                        {{ card.question }}
+    /* Centraliza o card perfeitamente na área de conteúdo do SaaS */
+    .delete-wrapper-centered {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: calc(100vh - 150px);
+    }
+
+    .delete-container {
+        width: 100%;
+        max-width: 500px;
+        animation: slideUp 0.5s ease-out;
+    }
+
+    .saas-card {
+        background: #ffffff;
+        border: 1px solid rgba(0,0,0,0.05) !important;
+        border-radius: 28px !important;
+        box-shadow: var(--saas-card-shadow) !important;
+        overflow: hidden;
+    }
+
+    .danger-accent {
+        height: 8px;
+        background: var(--saas-danger);
+        width: 100%;
+    }
+
+    .card-body-saas {
+        padding: 3rem 2rem;
+        text-align: center;
+    }
+
+    .icon-wrapper {
+        width: 80px;
+        height: 80px;
+        background-color: #fef2f2;
+        color: var(--saas-danger);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2rem;
+        animation: pulse-danger 2s infinite;
+    }
+
+    @keyframes pulse-danger {
+        0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.2); }
+        70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    .item-preview {
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 1.25rem;
+        margin: 1.5rem 0;
+        text-align: left;
+    }
+
+    .item-preview .label {
+        font-size: 0.7rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        color: var(--saas-text-muted);
+        letter-spacing: 0.05em;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+
+    .item-preview .content {
+        font-weight: 700;
+        color: var(--saas-text-main);
+        word-break: break-word;
+    }
+
+    .warning-box {
+        background-color: #fffbeb;
+        border-radius: 12px;
+        padding: 1rem;
+        text-align: left;
+        margin-bottom: 2rem;
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .warning-box i {
+        color: #d97706;
+        font-size: 1.25rem;
+        margin-top: 0.2rem;
+    }
+
+    .warning-text {
+        color: #92400e;
+        font-size: 0.85rem;
+        line-height: 1.4;
+    }
+
+    .btn-delete {
+        background-color: var(--saas-danger);
+        color: white !important;
+        border: none;
+        padding: 1rem;
+        border-radius: 14px;
+        font-weight: 700;
+        width: 100%;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-block;
+        box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);
+    }
+
+    .btn-delete:hover {
+        background-color: var(--saas-danger-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-cancel {
+        color: var(--saas-text-muted);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: inline-block;
+        transition: color 0.2s;
+    }
+
+    .btn-cancel:hover {
+        color: var(--saas-text-main);
+    }
+
+    .badge-danger-saas {
+        background-color: #fef2f2;
+        color: var(--saas-danger);
+        font-size: 0.7rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 0.4rem 0.8rem;
+        border-radius: 8px;
+        display: inline-block;
+    }
+
+    .extra-small { font-size: 0.65rem; }
+    .tracking-widest { letter-spacing: 0.1em; }
+
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<div class="delete-wrapper-centered">
+    <div class="delete-container">
+        <div class="card saas-card">
+            <div class="danger-accent"></div>
+            <div class="card-body-saas">
+                <div class="icon-wrapper">
+                    <i class="fas fa-trash-can"></i>
+                </div>
+                
+                <h2 class="h4 fw-bold mb-2">Excluir Flashcard</h2>
+                <p class="text-muted small mb-4">Você tem certeza que deseja apagar este card? Esta ação é permanente e não pode ser desfeita.</p>
+
+                <div class="mb-4">
+                    <span class="badge-danger-saas">Card Selecionado</span>
+                    <div class="item-preview">
+                        <span class="label">Pergunta</span>
+                        <div class="content">
+                            {{ card.question }}
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="warning-box">
-                <i class="fas fa-exclamation-triangle"></i>
-                <div class="warning-text">
-                    <strong>Atenção:</strong> Ao confirmar, este flashcard será removido e todo o seu histórico de revisões será perdido.
+                <div class="warning-box">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div class="warning-text">
+                        <strong>Atenção:</strong> Ao confirmar, este flashcard será removido e todo o seu histórico de revisões será perdido.
+                    </div>
                 </div>
-            </div>
 
-            <form method="POST">
-                {% csrf_token %}
-                <input type="hidden" name="origem" value="{{ origem }}">
-                
-                <button type="submit" class="btn btn-delete">
-                    <i class="fas fa-trash-confirm me-2"></i> Sim, excluir permanentemente
-                </button>
-                
-                <div class="text-center mt-3">
-                    {% if origem == 'geral' %}
-                        <a href="{% url 'flashcards:lista_flashcards' %}" class="btn btn-cancel">
-                            <i class="fas fa-times me-1"></i> Cancelar e manter card
-                        </a>
-                    {% else %}
-                        <a href="{% url 'subjects:materia_detalhes' card.baralho.subject.pk %}" class="btn btn-cancel">
-                            <i class="fas fa-times me-1"></i> Cancelar e manter card
-                        </a>
-                    {% endif %}
-                </div>
-            </form>
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="origem" value="{{ origem }}">
+                    
+                    <button type="submit" class="btn btn-delete">
+                        <i class="fas fa-trash-alt me-2"></i> Sim, excluir permanentemente
+                    </button>
+                    
+                    <div class="text-center mt-3">
+                        {% if origem == 'geral' %}
+                            <a href="{% url 'flashcards:lista_flashcards' %}" class="btn btn-cancel">
+                                <i class="fas fa-times me-1"></i> Cancelar e manter card
+                            </a>
+                        {% else %}
+                            <a href="{% url 'subjects:materia_detalhes' card.baralho.subject.pk %}" class="btn btn-cancel">
+                                <i class="fas fa-times me-1"></i> Cancelar e manter card
+                            </a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4 text-muted extra-small opacity-50 fw-bold text-uppercase tracking-widest">
+            Área Crítica do Sistema &bull; Studi SaaS
         </div>
     </div>
-    
 </div>
 {% endblock %}
