@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import include, path
 from . import views
 
 app_name = 'subjects'
@@ -14,5 +14,5 @@ urlpatterns = [
     path('<int:materia_pk>/baralhos/<int:baralho_pk>/excluir/', views.excluir_baralho, name='excluir_baralho'),
     path('<int:materia_pk>/baralhos/<int:baralho_pk>/duplicar/', views.duplicar_baralho, name='duplicar_baralho'),
     path('<int:materia_pk>/baralhos/<int:baralho_pk>/editar/', views.editar_baralho, name='editar_baralho'),
-
+    
 ]

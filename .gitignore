@@ -1,4 +1,5 @@
-# Ambiente Virtual
+# Ambiente Virtual (Adicionado 'virtual/')
+virtual/
 venv/
 env/
 .env

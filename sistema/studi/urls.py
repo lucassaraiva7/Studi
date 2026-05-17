@@ -22,4 +22,5 @@ urlpatterns = [
     path('', include('dashboard.urls')),
     path('flashcards/', include('flashcards.urls', namespace='flashcards')), # Apontando para o nome correto
     path('materias/', include('subjects.urls', namespace='subjects')),
+    path('generator/', include('generator.urls')),
 ]

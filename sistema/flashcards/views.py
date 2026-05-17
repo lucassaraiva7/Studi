@@ -5,6 +5,8 @@ from .models import Flashcard, ReviewLog, Baralho
 from .forms import FlashcardForm
 from django.db.models import Q
 from urllib.parse import urlparse
+from datetime import date  
+
 
 @login_required
 def lista_flashcards(request):
@@ -32,11 +34,12 @@ def lista_flashcards(request):
         'baralhos': baralhos,
         'query': query,
         'baralho_selecionado': baralho_id,
-        'today': date.today()  # Envia a data de hoje para o template
+        'today': date.today()  # <--- MUITO IMPORTANTE: Envia a data de hoje para o template
     })
 
 @login_required
 def novo_flashcard(request, baralho_id=None):
+    # Quando acessado sem baralho (rota geral), redireciona para um baralho do usuário.
     if baralho_id is None:
         primeiro_baralho = Baralho.objects.filter(subject__user=request.user).order_by('id').first()
         if not primeiro_baralho:
@@ -47,6 +50,8 @@ def novo_flashcard(request, baralho_id=None):
     
     if request.method == "POST":
         form = FlashcardForm(request.POST, user=request.user)
+        # Quando o formulário é criado para um baralho específico, o campo 'baralho' pode
+        # não estar presente no POST (pois o template o omite). Neste caso não exigir o campo.
         if 'baralho' in form.fields:
             form.fields['baralho'].required = False
 
@@ -56,10 +61,12 @@ def novo_flashcard(request, baralho_id=None):
             card.save()
             return redirect('subjects:baralho_detalhes', materia_pk=baralho.subject.pk, baralho_pk=baralho.pk)
     else:
+        # Passa o baralho para o formulário para que ele possa ser usado no template, se necessário
         form = FlashcardForm(initial={'baralho': baralho}, user=request.user)
 
     return render(request, 'flashcards/form_flashcard.html', {'form': form, 'baralho': baralho})
 
+# Substitua a função editar_flashcard por esta:
 @login_required
 def editar_flashcard(request, pk):
     card = get_object_or_404(Flashcard, id=pk, baralho__subject__user=request.user)
@@ -67,10 +74,12 @@ def editar_flashcard(request, pk):
 
     if request.method == "POST":
         form = FlashcardForm(request.POST, instance=card, user=request.user)
+        # Em edição, o campo 'baralho' não é mostrado no template, portanto não exigir
         if 'baralho' in form.fields:
             form.fields['baralho'].required = False
         if form.is_valid():
             updated = form.save(commit=False)
+            # Preserva o vínculo antes de salvar, porque o ModelForm pode limpar a relação.
             updated.baralho_id = baralho_id
             updated.save()
             return redirect('subjects:baralho_detalhes', materia_pk=updated.baralho.subject.pk, baralho_pk=baralho_id)
@@ -78,6 +87,8 @@ def editar_flashcard(request, pk):
         form = FlashcardForm(instance=card, user=request.user)
 
     return render(request, 'flashcards/form_flashcard.html', {'form': form, 'card': card, 'baralho': get_object_or_404(Baralho, pk=baralho_id, subject__user=request.user)})
+
+
 
 @login_required
 def excluir_flashcard(request, pk):
@@ -87,16 +98,17 @@ def excluir_flashcard(request, pk):
     if request.method == "POST":
         origem_post = request.POST.get('origem', '')
         card.delete()
+        # Redireciona conforme origem (lista geral ou detalhes do baralho)
         if origem_post == 'geral':
             return redirect('flashcards:lista_flashcards')
         return redirect('subjects:baralho_detalhes', materia_pk=baralho.subject.pk, baralho_pk=baralho.pk)
     return render(request, 'flashcards/confirmar_exclusao_card.html', {'card': card, 'origem': origem})
 
-
-# --- FUNÇÕES DE REVISÃO ATUALIZADAS ---
+# --- FUNÇÕES DE REVISÃO CORRIGIDAS ---
 
 def _iniciar_contadores_revisao(request):
     referer = request.META.get('HTTP_REFERER', '')
+    # Se o usuário está vindo de fora da revisão, zeramos os contadores SRS
     if 'revisar' not in referer and 'estudar-hoje' not in referer:
         request.session['facil'] = 0
         request.session['medio'] = 0
@@ -105,9 +117,6 @@ def _iniciar_contadores_revisao(request):
 @login_required
 def sessao_revisao(request, baralho_id):
     _iniciar_contadores_revisao(request)
-    
-    # INDICA QUE ESTAMOS A REVISAR APENAS UM BARALHO ESPECÍFICO
-    request.session['modo_global'] = False
     
     card = Flashcard.objects.filter(
         baralho_id=baralho_id,
@@ -121,10 +130,13 @@ def sessao_revisao(request, baralho_id):
         dificil = request.session.get('dificil', 0)
         total = facil + medio + dificil
         
+        # DISTINÇÃO AQUI:
         if total > 0:
+            # Se ele revisou pelo menos 1 card, mostra a tela de parabéns com stats
             context = {'facil': facil, 'medio': medio, 'dificil': dificil, 'total': total}
             return render(request, 'flashcards/resultados_revisao.html', context)
         else:
+            # Se ele entrou e não tinha nada, mostra a tela de "Tudo em dia"
             return render(request, 'flashcards/sem_cards_para_revisar.html')
         
     return render(request, 'flashcards/revisao.html', {'card': card})
@@ -133,18 +145,12 @@ def sessao_revisao(request, baralho_id):
 def estudar_tudo(request):
     _iniciar_contadores_revisao(request)
     
-    # INDICA AO SISTEMA QUE ESTAMOS NO MODO DE REVISÃO GLOBAL (Sessão Única)
-    request.session['modo_global'] = True
-    
     card = Flashcard.objects.filter(
         baralho__subject__user=request.user,
         next_review__lte=date.today()
     ).order_by('?').first()
     
     if not card:
-        # Quando terminarem todos os cards de todas as matérias, desliga a flag
-        request.session['modo_global'] = False
-        
         facil = request.session.get('facil', 0)
         medio = request.session.get('medio', 0)
         dificil = request.session.get('dificil', 0)
@@ -163,7 +169,7 @@ def estudar_tudo(request):
 def registrar_revisao(request, card_id, resultado):
     card = get_object_or_404(Flashcard, id=card_id, baralho__subject__user=request.user)
     
-    # Incrementa o contador na sessão
+    # Incrementa o contador na sessão (facil, medio ou dificil)
     request.session[resultado] = request.session.get(resultado, 0) + 1
     
     # Mapeamento de notas para o algoritmo
@@ -171,7 +177,7 @@ def registrar_revisao(request, card_id, resultado):
         grade = 5
     elif resultado == 'medio':
         grade = 4
-    else:
+    else: # dificil
         grade = 3
 
     # --- LÓGICA SM-2 ---
@@ -197,12 +203,6 @@ def registrar_revisao(request, card_id, resultado):
     card.save()
 
     ReviewLog.objects.create(card=card, grade=resultado)
+    
     request.session.modified = True
-
-    # --- REDIRECIONAMENTO INTELIGENTE (RESOLVE O TEU PROBLEMA) ---
-    if request.session.get('modo_global'):
-        # Se veio pelo botão "Revisar Tudo", mantém-se no loop global de todas as matérias
-        return redirect('flashcards:estudar_tudo')
-    else:
-        # Se entrou por um baralho individual, continua focado apenas nesse baralho
-        return redirect('flashcards:sessao_revisao', baralho_id=card.baralho.pk)
+    return redirect('flashcards:sessao_revisao', baralho_id=card.baralho.pk)

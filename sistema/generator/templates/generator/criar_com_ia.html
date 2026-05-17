@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}Criar com IA — Studi{% endblock %}
+
+{% block content %}
+<div class="container-fluid max-width-700">
+    
+    <div class="d-flex align-items-center mb-4">
+        <div class="bg-primary text-white p-3 rounded-3 me-3">
+            <i class="fas fa-robot fa-2x"></i>
+        </div>
+        <div>
+            <h2 class="fw-bold mb-1">Gerador de Flashcards com IA</h2>
+            <p class="text-muted mb-0">Envie um PDF e deixe nossa inteligência artificial criar seu baralho de estudos automaticamente.</p>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+        <form id="ia-generator-form" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="mb-4">
+                <label for="{{ form.nome_baralho.id_for_label }}" class="form-label fw-semibold text-secondary">
+                    {{ form.nome_baralho.label }}
+                </label>
+                <input type="text" name="nome_baralho" id="{{ form.nome_baralho.id_for_label }}" 
+                       class="form-control form-control-lg {% if form.nome_baralho.errors %}is-invalid{% endif %}" 
+                       placeholder="Ex: Anatomia Humana - Sistema Ósseo" required>
+                {% if form.nome_baralho.errors %}
+                    <div class="invalid-feedback">{{ form.nome_baralho.errors.0 }}</div>
+                {% endif %}
+                <small class="text-muted d-block mt-1">{{ form.nome_baralho.help_text }}</small>
+            </div>
+
+            <div class="mb-4">
+                <label for="{{ form.materia.id_for_label }}" class="form-label fw-semibold text-secondary">
+                    {{ form.materia.label }}
+                </label>
+                <select name="materia" id="{{ form.materia.id_for_label }}" 
+                        class="form-select form-select-lg {% if form.materia.errors %}is-invalid{% endif %}" required>
+                    {% for choice in form.materia.field.choices %}
+                        <option value="{{ choice.0 }}" {% if choice.0 == form.materia.value %}selected{% endif %}>{{ choice.1 }}</option>
+                    {% endfor %}
+                </select>
+                {% if form.materia.errors %}
+                    <div class="invalid-feedback">{{ form.materia.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="mb-4">
+                <label for="{{ form.arquivo_pdf.id_for_label }}" class="form-label fw-semibold text-secondary">
+                    {{ form.arquivo_pdf.label }}
+                </label>
+                <input type="file" name="arquivo_pdf" id="{{ form.arquivo_pdf.id_for_label }}" 
+                       class="form-control {% if form.arquivo_pdf.errors %}is-invalid{% endif %}" 
+                       accept=".pdf" required>
+                {% if form.arquivo_pdf.errors %}
+                    <div class="invalid-feedback">{{ form.arquivo_pdf.errors.0 }}</div>
+                {% endif %}
+                <small class="text-muted d-block mt-1">{{ form.arquivo_pdf.help_text }}</small>
+            </div>
+
+            <hr class="text-light my-4">
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg fw-semibold py-3 rounded-3 shadow-sm">
+                    <i class="fas fa-magic me-2"></i> Criar Baralho com Inteligência Artificial
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="loadingOverlay" class="loading-overlay d-none">
+    <div class="text-center p-4 bg-white rounded-4 shadow-lg max-width-400">
+        <div class="spinner-border text-primary mb-3" style="width: 3.5rem; height: 3.5rem;" role="status">
+            <span class="visually-hidden">Processando...</span>
+        </div>
+        <h4 class="fw-bold text-dark mb-2">Construindo seus Flashcards...</h4>
+        <p class="text-secondary small mb-0">Nossa Inteligência Artificial está lendo seu PDF e estruturando as melhores perguntas e respostas. Isso pode levar alguns segundos, por favor não saia da página!</p>
+    </div>
+</div>
+
+<style>
+    .max-width-700 { max-width: 700px; }
+    .max-width-400 { max-width: 400px; }
+    
+    /* Configuração da Tela de Bloqueio/Carregamento */
+    .loading-overlay {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background-color: rgba(15, 23, 42, 0.7); /* Slate escuro transparente */
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(4px); /* Efeito blur de fundo */
+    }
+</style>
+
+<script>
+    document.getElementById('ia-generator-form').addEventListener('submit', function() {
+        // Remove a classe 'd-none' do Bootstrap para exibir a tela de carregamento
+        document.getElementById('loadingOverlay').classList.remove('d-none');
+    });
+</script>
+{% endblock %}
