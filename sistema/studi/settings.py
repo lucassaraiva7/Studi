@@ -131,3 +131,9 @@ LOGIN_URL = '/admin/login/'
 
 #API
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+# Para onde o usuário vai após fazer login com sucesso
+LOGIN_REDIRECT_URL = '/'  
+
+# Para onde ele vai quando clicar em Sair (Logout)
+LOGOUT_REDIRECT_URL = '/usuarios/login/'
