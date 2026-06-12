@@ -137,3 +137,7 @@ LOGIN_REDIRECT_URL = '/'
 
 # Para onde ele vai quando clicar em Sair (Logout)
 LOGOUT_REDIRECT_URL = '/usuarios/login/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
