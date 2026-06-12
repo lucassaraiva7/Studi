@@ -136,6 +136,18 @@
             color: white;
         }
 
+        /* Ajuste do botão de logout para se comportar como o link */
+        .nav-item-btn-logout {
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+        }
+        .nav-item-btn-logout:hover i, 
+        .nav-item-btn-logout:hover span {
+            color: #ef4444 !important; /* Vermelho suave ao passar o mouse */
+        }
+
         /* --- CONTEÚDO PRINCIPAL --- */
         .main-wrapper {
             margin-left: var(--sidebar-width);
@@ -190,6 +202,26 @@
                 </a>
             </li>
         </ul>
+
+        {% if user.is_authenticated %}
+        <ul class="sidebar-nav mt-auto border-top border-secondary border-opacity-10">
+            <li>
+                <a href="#" class="nav-item-link">
+                    <i class="fas fa-user-gear"></i>
+                    <span class="nav-item-text">Minha Conta ({{ user.username }})</span>
+                </a>
+            </li>
+            <li>
+                <form action="{% url 'logout' %}" method="POST" class="m-0 p-0">
+                    {% csrf_token %}
+                    <button type="submit" class="nav-item-link nav-item-btn-logout">
+                        <i class="fas fa-right-from-bracket text-muted"></i>
+                        <span class="nav-item-text text-muted">Sair</span>
+                    </button>
+                </form>
+            </li>
+        </ul>
+        {% endif %}
     </div>
 
     <div class="main-wrapper">
