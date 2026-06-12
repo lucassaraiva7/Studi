@@ -212,7 +212,7 @@
         {% if user.is_authenticated %}
         <ul class="sidebar-nav mt-auto border-top border-secondary border-opacity-10">
             <li>
-                <a href="#" class="nav-item-link">
+                <a href="{% url 'perfil' %}" class="nav-item-link {% if request.resolver_match.url_name == 'perfil' %}active{% endif %}">
                     <i class="fas fa-user-gear"></i>
                     <span class="nav-item-text">Minha Conta ({{ user.username }})</span>
                 </a>
