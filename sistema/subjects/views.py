@@ -4,7 +4,7 @@ from .models import Subject
 from .forms import SubjectForm
 from flashcards.models import Baralho 
 from flashcards.forms import BaralhoForm 
-from flashcards.models import Flashcard # Precisamos do Flashcard aqui
+from flashcards.models import Flashcard 
 @login_required
 def lista_materias(request):
     # CORREÇÃO: Filtra as matérias para mostrar apenas as do usuário logado.
