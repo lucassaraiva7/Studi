@@ -125,7 +125,7 @@ STATIC_URL = 'static/'
 
 
 # No final do arquivo settings.py
-LOGIN_URL = '/admin/login/'
+LOGIN_URL = '/auth/login/'
 
 # settings.py
 
@@ -133,11 +133,13 @@ LOGIN_URL = '/admin/login/'
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 # Para onde o usuário vai após fazer login com sucesso
-LOGIN_REDIRECT_URL = '/'  
+LOGIN_REDIRECT_URL = '/dashboard/'  
 
 # Para onde ele vai quando clicar em Sair (Logout)
-LOGOUT_REDIRECT_URL = '/usuarios/login/'
+LOGOUT_REDIRECT_URL = '/'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
+
+

@@ -1,27 +1,26 @@
-"""
-URL configuration for studi project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/6.0/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import path, include
+from django.views.generic import TemplateView
 
 urlpatterns = [
+    # Rota do painel de administracao padrao
     path('admin/', admin.site.urls),
-    path('', include('dashboard.urls')),
-    path('flashcards/', include('flashcards.urls', namespace='flashcards')), # Apontando para o nome correto
-    path('materias/', include('subjects.urls', namespace='subjects')),
+
+    # Rota da raiz - Carrega a Landing Page
+    path('', TemplateView.as_view(template_name='landing.html'), name='landing'),
+
+    # Rota do Dashboard - Painel interno pos-login
+    path('dashboard/', include('dashboard.urls')),
+
+    # Rota das materias
+    path('subjects/', include('subjects.urls')),
+
+    # Rota dos flashcards
+    path('flashcards/', include('flashcards.urls')),
+
+    # Rota do gerador IA
     path('generator/', include('generator.urls')),
-    path('usuarios/', include('usuarios.urls')),
+
+    # Rotas de autenticacao e perfil
+    path('auth/', include('usuarios.urls')),
 ]

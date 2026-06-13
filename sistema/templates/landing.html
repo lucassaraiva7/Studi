@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studi — Memorização Inteligente com Flashcards</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Icons & Animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+    
+    <style>
+        :root {
+            /* Cores Originais Revisitadas com Nível SaaS */
+            --bg-main: #0f172a;       
+            --bg-card: #1e293b;
+            --saas-blue: #2563eb;     
+            --saas-blue-hover: #1d4ed8;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .logo-text {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        /* --- NAVBAR --- */
+        .navbar {
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: sticky;
+            top: 0;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            z-index: 1000;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            color: #fff;
+        }
+
+        .nav-btns {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .btn-link { color: var(--text-muted); }
+        .btn-link:hover { color: #fff; }
+
+        .btn-fill {
+            background: var(--saas-blue);
+            color: white;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-fill:hover {
+            background: var(--saas-blue-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+        }
+
+        /* --- HERO --- */
+        .hero {
+            padding: 8rem 2rem 4rem 2rem;
+            text-align: center;
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(37, 99, 235, 0.15) 0%, transparent 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(37, 99, 235, 0.1);
+            color: #60a5fa;
+            padding: 8px 16px;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.2rem);
+            line-height: 1.1;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            letter-spacing: -2px;
+            background: linear-gradient(to bottom right, #fff 50%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 3rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* --- FLASHCARD PREVIEW --- */
+        .flashcard-container {
+            margin-top: 4rem;
+            perspective: 1000px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .flashcard-ui {
+            width: 380px;
+            height: 240px;
+            background: var(--bg-card);
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-shadow: 0 30px 60px -12px rgba(0,0,0,0.5);
+            cursor: pointer;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+        }
+
+        .flashcard-ui:hover {
+            transform: translateY(-10px) rotateX(5deg);
+            border-color: rgba(37, 99, 235, 0.5);
+        }
+
+        .card-label {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--saas-blue);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .card-question {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #fff;
+            line-height: 1.4;
+        }
+
+        .card-footer {
+            position: absolute;
+            bottom: 24px;
+            left: 24px;
+            right: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        /* --- FEATURES GRID --- */
+        .features {
+            padding: 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            padding: 3rem;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: rgba(37, 99, 235, 0.3);
+            background: rgba(30, 41, 59, 0.8);
+        }
+
+        .icon-box {
+            width: 54px;
+            height: 54px;
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--saas-blue);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            margin-bottom: 2rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        /* --- CTA SECTION --- */
+        .cta-section {
+            padding: 6rem 2rem 10rem 2rem;
+            text-align: center;
+        }
+
+        .cta-box {
+            background: linear-gradient(135deg, var(--saas-blue) 0%, #1d4ed8 100%);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 5rem 2rem;
+            border-radius: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-box h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: #fff;
+        }
+
+        .btn-white {
+            background: #fff;
+            color: var(--saas-blue);
+            padding: 16px 40px;
+            font-size: 1.1rem;
+        }
+
+        .btn-white:hover {
+            background: #f8fafc;
+            transform: translateY(-2px);
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            padding: 4rem 2rem;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.8rem; }
+            .flashcard-ui { width: 100%; max-width: 340px; }
+            .navbar { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/" class="logo">
+            <svg width="32" height="32" viewBox="0 0 450 450" xmlns="http://www.w3.org/2000/svg">
+                <rect x="50" y="50" width="350" height="350" rx="60" fill="#2563eb"/>
+                <rect x="120" y="120" width="210" height="210" rx="20" fill="#fff"/>
+            </svg>
+            <span class="logo-text">Studi</span>
+        </a>
+        <div class="nav-btns">
+            <a href="{% url 'login' %}" class="btn btn-link">Entrar</a>
+            <a href="{% url 'cadastro' %}" class="btn btn-fill">Criar Conta</a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <div class="badge" data-aos="fade-down">Foco total em retenção</div>
+            <h1 data-aos="fade-up">Domine qualquer assunto com Flashcards.</h1>
+            <p data-aos="fade-up" data-aos-delay="100">
+                A forma mais eficiente de estudar. Use repetição espaçada para transformar conteúdos complexos em conhecimento memorizado para sempre.
+            </p>
+            
+            <div data-aos="fade-up" data-aos-delay="200">
+                <a href="{% url 'cadastro' %}" class="btn btn-fill" style="padding: 18px 42px; font-size: 1.1rem;">
+                    Começar a Estudar Agora
+                </a>
+            </div>
+
+            <div class="flashcard-container" data-aos="zoom-in" data-aos-delay="300">
+                <div class="flashcard-ui" id="demo-card">
+                    <span class="card-label">Anatomia Humana</span>
+                    <div class="card-question" id="card-text">
+                        Qual é o maior órgão do corpo humano?
+                    </div>
+                    <div class="card-footer">
+                        <span><i class="fas fa-sync-alt"></i> Clique para virar</span>
+                        <span>1/15</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features">
+            <div class="grid">
+                <div class="feature-card" data-aos="fade-up">
+                    <div class="icon-box"><i class="fas fa-brain"></i></div>
+                    <h3>Revisão Inteligente</h3>
+                    <p>Nosso sistema organiza suas revisões com base na curva do esquecimento. Você revisa apenas o que é necessário, no momento certo.</p>
+                </div>
+
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="icon-box"><i class="fas fa-bolt"></i></div>
+                    <h3>Recordação Ativa</h3>
+                    <p>Saia do estudo passivo. Os flashcards forçam seu cérebro a recuperar a informação, criando conexões neurais muito mais fortes.</p>
+                </div>
+
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="icon-box"><i class="fas fa-layer-group"></i></div>
+                    <h3>Organização Simples</h3>
+                    <p>Crie baralhos por matérias, temas ou exames. Tudo centralizado para que você foque apenas no que importa: aprender.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta-section">
+            <div class="cta-box" data-aos="zoom-in">
+                <h2>Pronto para elevar seu nível de estudo?</h2>
+                <a href="{% url 'cadastro' %}" class="btn btn-white">
+                    Criar minha conta gratuita
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Studi — O futuro da sua memorização.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            once: true
+        });
+
+        // Lógica de interação do Card
+        const card = document.getElementById('demo-card');
+        const text = document.getElementById('card-text');
+        let isFront = true;
+
+        card.addEventListener('click', () => {
+            card.style.transform = 'rotateY(90deg)';
+            setTimeout(() => {
+                if(isFront) {
+                    text.innerText = "A pele.";
+                    text.style.color = "#60a5fa";
+                    text.style.textAlign = "center";
+                    text.style.fontSize = "2rem";
+                } else {
+                    text.innerText = "Qual é o maior órgão do corpo humano?";
+                    text.style.color = "#fff";
+                    text.style.textAlign = "left";
+                    text.style.fontSize = "1.25rem";
+                }
+                card.style.transform = 'rotateY(0deg)';
+                isFront = !isFront;
+            }, 300);
+        });
+    </script>
+</body>
+</html>
