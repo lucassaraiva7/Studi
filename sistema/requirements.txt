@@ -50,3 +50,4 @@ tzdata==2025.3
 uritemplate==4.2.0
 urllib3==2.6.2
 websockets==16.0
+gunicorn
